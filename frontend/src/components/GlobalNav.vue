@@ -2,6 +2,7 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 
+import NotificationBell from '@/components/NotificationBell.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
@@ -34,10 +35,12 @@ async function onLogout() {
         <RouterLink :to="{ name: 'home', hash: '#company' }">회사소개</RouterLink>
         <RouterLink :to="{ name: 'home', hash: '#data' }">연구·데이터</RouterLink>
         <RouterLink :to="{ name: 'posts' }">게시판</RouterLink>
+        <RouterLink v-if="auth.isAdmin" :to="{ name: 'admin' }">관리자</RouterLink>
       </nav>
 
       <div class="gnav-right">
         <template v-if="auth.isLoggedIn">
+          <NotificationBell />
           <RouterLink :to="{ name: 'post-create' }" class="gn-btn">글쓰기</RouterLink>
           <RouterLink :to="{ name: 'mypage' }" class="gn-link">
             {{ auth.user?.nickname || '마이페이지' }}

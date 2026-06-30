@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 
+import { adminApi } from '@/api/admin'
 import { commentApi } from '@/api/comment'
 import { useAuthStore } from '@/stores/auth'
 import { errorMessage, formatDate } from '@/utils/format'
@@ -48,6 +49,19 @@ async function remove() {
   busy.value = true
   try {
     await commentApi.remove(props.comment.id)
+    emit('changed')
+  } catch (e) {
+    error.value = errorMessage(e)
+  } finally {
+    busy.value = false
+  }
+}
+
+async function adminRemove() {
+  if (!confirm('[관리자] 이 댓글을 강제 삭제할까요?')) return
+  busy.value = true
+  try {
+    await adminApi.deleteComment(props.comment.id)
     emit('changed')
   } catch (e) {
     error.value = errorMessage(e)
@@ -119,6 +133,13 @@ async function submitReply() {
         <button class="link" @click="startEdit">수정</button>
         <button class="link danger" @click="remove">삭제</button>
       </template>
+      <button
+        v-else-if="auth.isAdmin"
+        class="link danger"
+        @click="adminRemove"
+      >
+        관리자 삭제
+      </button>
     </div>
     <p v-if="error" class="error-text">{{ error }}</p>
 

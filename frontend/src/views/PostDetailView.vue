@@ -4,6 +4,7 @@ import { RouterLink, useRouter } from 'vue-router'
 
 import CommentList from '@/components/CommentList.vue'
 import LikeButton from '@/components/LikeButton.vue'
+import { adminApi } from '@/api/admin'
 import { fileApi, postApi } from '@/api/post'
 import { useAuthStore } from '@/stores/auth'
 import { errorMessage, formatDate, formatSize } from '@/utils/format'
@@ -68,6 +69,16 @@ async function remove() {
   }
 }
 
+async function adminRemove() {
+  if (!confirm('[관리자] 이 게시글을 강제 삭제할까요?')) return
+  try {
+    await adminApi.deletePost(props.id)
+    router.push({ name: 'posts' })
+  } catch (e) {
+    error.value = errorMessage(e)
+  }
+}
+
 onMounted(load)
 </script>
 
@@ -95,6 +106,13 @@ onMounted(load)
             </RouterLink>
             <button class="btn btn-danger small" @click="remove">삭제</button>
           </template>
+          <button
+            v-else-if="auth.isAdmin"
+            class="btn btn-danger small"
+            @click="adminRemove"
+          >
+            관리자 삭제
+          </button>
         </div>
 
         <div class="content">{{ post.content }}</div>

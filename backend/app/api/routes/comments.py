@@ -2,10 +2,13 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, get_optional_user
+from app.core.config import settings
 from app.core.database import get_db
+from app.core.email import send_email
 from app.core.errors import bad_request, forbidden, not_found
 from app.crud import comment as comment_crud
 from app.crud import like as like_crud
+from app.crud import notification as notif_crud
 from app.crud import post as post_crud
 from app.models.comment import Comment
 from app.models.user import User
@@ -79,9 +82,11 @@ def create_comment(
     current: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    if post_crud.get(db, post_id) is None:
+    post = post_crud.get(db, post_id)
+    if post is None:
         raise not_found("게시글을 찾을 수 없습니다.", "POST_NOT_FOUND")
 
+    parent = None
     if payload.parent_id is not None:
         parent = comment_crud.get(db, payload.parent_id)
         if parent is None or parent.post_id != post_id:
@@ -98,6 +103,34 @@ def create_comment(
         parent_id=payload.parent_id,
     )
     db.refresh(comment)
+
+    # 알림: 글 작성자에게 (본인 제외)
+    notif_crud.notify(
+        db,
+        recipient_id=post.user_id,
+        actor_id=current.id,
+        type="comment",
+        message=f"{current.nickname}님이 회원님의 글에 댓글을 남겼습니다.",
+        post_id=post_id,
+    )
+    # 대댓글이면 부모 댓글 작성자에게도
+    if parent is not None:
+        notif_crud.notify(
+            db,
+            recipient_id=parent.user_id,
+            actor_id=current.id,
+            type="reply",
+            message=f"{current.nickname}님이 회원님의 댓글에 답글을 남겼습니다.",
+            post_id=post_id,
+        )
+    # 이메일 알림(메일 설정된 경우, 글 작성자에게)
+    if settings.email_enabled and post.user_id != current.id and post.author:
+        send_email(
+            post.author.email,
+            "[달구 게시판] 새 댓글 알림",
+            f"'{post.title}' 글에 {current.nickname}님이 댓글을 남겼습니다.\n\n"
+            f"{payload.content}",
+        )
     return _serialize(comment, {}, set())
 
 
@@ -145,7 +178,15 @@ def like_comment(
     comment = comment_crud.get(db, comment_id)
     if comment is None or comment.is_deleted:
         raise not_found("댓글을 찾을 수 없습니다.", "COMMENT_NOT_FOUND")
-    like_crud.add_comment_like(db, comment_id, current.id)
+    if like_crud.add_comment_like(db, comment_id, current.id):
+        notif_crud.notify(
+            db,
+            recipient_id=comment.user_id,
+            actor_id=current.id,
+            type="comment_like",
+            message=f"{current.nickname}님이 회원님의 댓글을 좋아합니다.",
+            post_id=comment.post_id,
+        )
     return LikeResponse(
         liked=True, like_count=like_crud.comment_like_count(db, comment_id)
     )

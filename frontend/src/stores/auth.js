@@ -14,6 +14,7 @@ export const useAuthStore = defineStore('auth', () => {
   const ready = ref(false) // 초기 복원 완료 여부
 
   const isLoggedIn = computed(() => user.value !== null)
+  const isAdmin = computed(() => user.value?.is_admin === true)
 
   async function login(username, password) {
     const { data } = await authApi.login({ username, password })
@@ -66,6 +67,7 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     ready,
     isLoggedIn,
+    isAdmin,
     login,
     logout,
     fetchMe,

@@ -100,6 +100,7 @@ class UserOut(BaseModel):
     email: EmailStr
     nickname: str
     is_active: bool
+    is_admin: bool = False
     created_at: datetime
 
 
@@ -108,3 +109,19 @@ class UserMe(UserOut):
 
     post_count: int = 0
     comment_count: int = 0
+
+
+class UserAdminOut(BaseModel):
+    """관리자 회원 목록용."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    username: str
+    email: EmailStr
+    nickname: str
+    is_active: bool
+    is_admin: bool
+    post_count: int = 0
+    comment_count: int = 0
+    created_at: datetime

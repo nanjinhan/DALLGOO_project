@@ -3,6 +3,7 @@
 from app.models.comment import Comment
 from app.models.file import File
 from app.models.like import CommentLike, PostLike
+from app.models.notification import Notification
 from app.models.post import Post
 from app.models.token import PasswordResetToken, RefreshToken
 from app.models.user import User
@@ -16,4 +17,5 @@ __all__ = [
     "File",
     "RefreshToken",
     "PasswordResetToken",
+    "Notification",
 ]

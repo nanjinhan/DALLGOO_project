@@ -8,7 +8,15 @@ from sqlalchemy.exc import IntegrityError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from app.api.routes import auth, comments, files, posts, users
+from app.api.routes import (
+    admin,
+    auth,
+    comments,
+    files,
+    notifications,
+    posts,
+    users,
+)
 from app.core.config import settings
 from app.core.errors import AppError
 
@@ -159,6 +167,8 @@ app.include_router(posts.router, prefix=api_prefix)
 app.include_router(comments.post_router, prefix=api_prefix)
 app.include_router(comments.router, prefix=api_prefix)
 app.include_router(files.router, prefix=api_prefix)
+app.include_router(admin.router, prefix=api_prefix)
+app.include_router(notifications.router, prefix=api_prefix)
 
 
 @app.get("/api/health", tags=["health"])

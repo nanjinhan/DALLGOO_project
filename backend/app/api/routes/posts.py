@@ -6,6 +6,7 @@ from app.core.database import get_db
 from app.core.errors import forbidden, not_found
 from app.crud import file as file_crud
 from app.crud import like as like_crud
+from app.crud import notification as notif_crud
 from app.crud import post as post_crud
 from app.models.user import User
 from app.schemas.common import LikeResponse, Message, Page
@@ -113,9 +114,18 @@ def like_post(
     current: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    if post_crud.get(db, post_id) is None:
+    post = post_crud.get(db, post_id)
+    if post is None:
         raise not_found("게시글을 찾을 수 없습니다.", "POST_NOT_FOUND")
-    like_crud.add_post_like(db, post_id, current.id)
+    if like_crud.add_post_like(db, post_id, current.id):
+        notif_crud.notify(
+            db,
+            recipient_id=post.user_id,
+            actor_id=current.id,
+            type="post_like",
+            message=f"{current.nickname}님이 회원님의 글을 좋아합니다.",
+            post_id=post_id,
+        )
     return LikeResponse(liked=True, like_count=like_crud.post_like_count(db, post_id))
 
 

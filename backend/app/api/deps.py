@@ -3,7 +3,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.errors import unauthorized
+from app.core.errors import forbidden, unauthorized
 from app.core.security import ACCESS_TOKEN_TYPE, decode_token
 from app.crud import user as user_crud
 from app.models.user import User
@@ -26,6 +26,13 @@ def get_current_user(
     if user is None or not user.is_active:
         raise unauthorized("유효하지 않은 사용자입니다.", "INVALID_USER")
     return user
+
+
+def get_admin_user(current: User = Depends(get_current_user)) -> User:
+    """관리자만 통과. 아니면 403."""
+    if not current.is_admin:
+        raise forbidden("관리자 권한이 필요합니다.", "ADMIN_ONLY")
+    return current
 
 
 def get_optional_user(
