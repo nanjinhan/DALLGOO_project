@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 
+import PasswordInput from '@/components/PasswordInput.vue'
 import { authApi } from '@/api/auth'
 import { errorMessage } from '@/utils/format'
 
@@ -20,14 +21,10 @@ async function requestToken() {
   busy.value = true
   error.value = ''
   try {
-    const { data } = await authApi.forgotPassword(email.value)
-    // 학습용: 메일 인프라가 없어 토큰을 응답으로 받아 자동 채움
-    if (data.reset_token) {
-      token.value = data.reset_token
-      info.value = '재설정 토큰이 발급되었습니다. 새 비밀번호를 설정하세요.'
-    } else {
-      info.value = '가입된 이메일이라면 재설정 안내가 발송됩니다.'
-    }
+    await authApi.forgotPassword(email.value)
+    // 보안상 토큰은 응답에 오지 않는다. 실서비스는 이메일로, 개발 중에는 서버 로그에서 확인 후 입력.
+    info.value =
+      '가입된 이메일이라면 재설정 안내(토큰)를 보냈습니다. 받은 토큰을 아래에 입력하세요.'
     step.value = 2
   } catch (e) {
     error.value = errorMessage(e)
@@ -79,11 +76,11 @@ async function reset() {
       </div>
       <div class="field">
         <label>새 비밀번호 (8~64자, 대·소문자·숫자 포함)</label>
-        <input v-model="newPassword" type="password" class="input" />
+        <PasswordInput v-model="newPassword" autocomplete="new-password" />
       </div>
       <div class="field">
         <label>새 비밀번호 확인</label>
-        <input v-model="newPasswordConfirm" type="password" class="input" />
+        <PasswordInput v-model="newPasswordConfirm" autocomplete="new-password" />
       </div>
       <p v-if="error" class="error-text">{{ error }}</p>
       <button class="btn btn-primary full" :disabled="busy">비밀번호 변경</button>

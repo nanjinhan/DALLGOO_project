@@ -27,3 +27,7 @@ def bad_request(detail: str, code: str = "BAD_REQUEST") -> AppError:
 
 def unauthorized(detail: str = "인증이 필요합니다.", code: str = "UNAUTHORIZED") -> AppError:
     return AppError(status.HTTP_401_UNAUTHORIZED, detail, code)
+
+
+def too_many(detail: str, code: str = "TOO_MANY_ATTEMPTS") -> AppError:
+    return AppError(status.HTTP_429_TOO_MANY_REQUESTS, detail, code)

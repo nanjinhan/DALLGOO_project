@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from app.schemas.validators import validate_password
 
@@ -33,9 +33,8 @@ class ForgotPasswordRequest(BaseModel):
 
 
 class ForgotPasswordResponse(BaseModel):
+    # 보안상 토큰은 응답에 노출하지 않는다. (실서비스: 이메일 발송 / 개발: 서버 로그)
     detail: str
-    # 학습/내부용: 메일 발송 인프라가 없으므로 토큰을 응답으로 노출.
-    reset_token: str
 
 
 class ResetPasswordRequest(BaseModel):
@@ -46,3 +45,13 @@ class ResetPasswordRequest(BaseModel):
     @classmethod
     def _v_new_password(cls, v: str) -> str:
         return validate_password(v)
+
+
+# ===== 이메일 인증 / 아이디 찾기 =====
+class EmailRequest(BaseModel):
+    email: EmailStr
+
+
+class EmailVerifyRequest(BaseModel):
+    email: EmailStr
+    code: str = Field(min_length=6, max_length=6)

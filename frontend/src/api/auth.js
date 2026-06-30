@@ -11,6 +11,13 @@ export const authApi = {
   logout: (refresh_token) => client.post('/auth/logout', { refresh_token }),
   forgotPassword: (email) => client.post('/auth/password/forgot', { email }),
   resetPassword: (data) => client.post('/auth/password/reset', data),
+  // 설정(이메일 인증 필요 여부 등)
+  config: () => client.get('/auth/config'),
+  // 이메일 인증 / 아이디 찾기
+  sendEmailCode: (email) => client.post('/auth/email/send-code', { email }),
+  verifyEmailCode: (email, code) =>
+    client.post('/auth/email/verify', { email, code }),
+  findUsername: (email) => client.post('/auth/username/find', { email }),
 }
 
 export const userApi = {

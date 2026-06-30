@@ -1,5 +1,49 @@
 <script setup>
+import { onMounted, onUnmounted, ref } from 'vue'
+
 import ImageSlot from '@/components/company/ImageSlot.vue'
+
+// 상단 스크롤 진행률 표시줄(Scroll Progress Bar)
+const progress = ref(0)
+function onScroll() {
+  const max = document.documentElement.scrollHeight - window.innerHeight
+  progress.value = max > 0 ? Math.min(100, (window.scrollY / max) * 100) : 0
+}
+
+// 스크롤 등장 애니메이션 — 뷰포트에 들어오면 위로 떠오르고, 나가면 리셋(다시 들어오면 재생)
+const root = ref(null)
+let io = null
+
+onMounted(() => {
+  window.addEventListener('scroll', onScroll, { passive: true })
+  onScroll()
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  if (reduce || !root.value) return
+
+  const selector =
+    '.lp-eyebrow, .lp-h1, .lp-h2, .lp-lead, .lp-badge, .lp-actions, ' +
+    '.lp-links-row, .stats, .phone, .dash, .ai-card, .trio-card, ' +
+    '.outing-img, .svc, .info, .why'
+  const els = root.value.querySelectorAll(selector)
+  els.forEach((el) => el.classList.add('reveal'))
+
+  io = new IntersectionObserver(
+    (entries) => {
+      // 들어오면 add, 나가면 remove → 스크롤할 때마다 다시 애니메이션
+      entries.forEach((e) => {
+        e.target.classList.toggle('reveal-in', e.isIntersecting)
+      })
+    },
+    { threshold: 0.15, rootMargin: '0px 0px -12% 0px' },
+  )
+  els.forEach((el) => io.observe(el))
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', onScroll)
+  io && io.disconnect()
+})
 
 const dataCards = [
   {
@@ -54,7 +98,10 @@ const companyInfo = [
 </script>
 
 <template>
-  <div class="lp">
+  <div class="lp" ref="root">
+    <!-- 스크롤 진행률 표시줄 -->
+    <div class="scroll-progress" :style="{ width: progress + '%' }" />
+
     <main id="top">
       <!-- ===== 히어로 ===== -->
       <section class="lp-section hero">
@@ -815,6 +862,45 @@ const companyInfo = [
   line-height: 1.7;
   color: var(--c-text-2);
   margin: 0 0 16px;
+}
+
+/* ===== 스크롤 진행률 표시줄 ===== */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0;
+  background: linear-gradient(90deg, var(--c-primary), #2997ff);
+  z-index: 200;
+  transition: width 0.08s linear;
+}
+
+/* ===== 스크롤 등장 애니메이션 ===== */
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal-in {
+  opacity: 1;
+  transform: none;
+}
+/* 같은 행 카드들은 살짝 시차를 두고 */
+.trio-card.reveal:nth-child(2) {
+  transition-delay: 0.08s;
+}
+.trio-card.reveal:nth-child(3) {
+  transition-delay: 0.16s;
+}
+.svc-list .svc.reveal:nth-child(2) {
+  transition-delay: 0.07s;
+}
+.svc-list .svc.reveal:nth-child(3) {
+  transition-delay: 0.14s;
 }
 
 /* ===== 반응형 ===== */

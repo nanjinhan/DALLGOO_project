@@ -15,6 +15,17 @@ def _ext(filename: str) -> str:
 
 def save_upload(db: Session, post_id: int, upload: UploadFile) -> File:
     """단일 업로드 파일을 디스크에 저장하고 DB 레코드 생성."""
+    # 1) 확장자 검증 (화이트리스트)
+    ext = _ext(upload.filename or "").lstrip(".")
+    allowed = settings.allowed_ext_set
+    if allowed and ext not in allowed:
+        raise bad_request(
+            f"허용되지 않는 파일 형식입니다(.{ext or '?'}). "
+            f"허용: {', '.join(sorted(allowed))}",
+            "FILE_TYPE_NOT_ALLOWED",
+        )
+
+    # 2) 용량 검증
     contents = upload.file.read()
     if len(contents) > settings.max_upload_size_bytes:
         raise bad_request(

@@ -33,6 +33,12 @@ const routes = [
     meta: { guestOnly: true },
   },
   {
+    path: '/find-id',
+    name: 'find-id',
+    component: () => import('@/views/FindIdView.vue'),
+    meta: { guestOnly: true },
+  },
+  {
     path: '/mypage',
     name: 'mypage',
     component: () => import('@/views/MyPageView.vue'),

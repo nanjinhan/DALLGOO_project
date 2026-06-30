@@ -95,6 +95,15 @@ onMounted(() => {
   gap: 8px;
   margin-bottom: 12px;
 }
+/* 입력칸은 늘고, 셀렉트·검색 버튼은 한 줄로 고정 */
+.search-row .input {
+  flex: 1;
+  min-width: 0;
+}
+.search-row .btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
 .select.narrow {
   width: auto;
   min-width: 110px;

@@ -11,6 +11,7 @@ export default defineConfig({
     },
   },
   server: {
+    host: true, // 0.0.0.0 바인딩 → 같은 와이파이의 다른 기기에서 접속 가능
     port: 5173,
     proxy: {
       // /api → 백엔드 컨테이너(:8000)로 프록시

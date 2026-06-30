@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
+import PasswordInput from '@/components/PasswordInput.vue'
 import { useAuthStore } from '@/stores/auth'
 import { errorMessage } from '@/utils/format'
 
@@ -39,18 +40,14 @@ async function submit() {
       </div>
       <div class="field">
         <label>비밀번호</label>
-        <input
-          v-model="password"
-          type="password"
-          class="input"
-          autocomplete="current-password"
-        />
+        <PasswordInput v-model="password" autocomplete="current-password" />
       </div>
       <p v-if="error" class="error-text">{{ error }}</p>
       <button class="btn btn-primary full" :disabled="busy">로그인</button>
     </form>
     <div class="links">
       <RouterLink :to="{ name: 'signup' }">회원가입</RouterLink>
+      <RouterLink :to="{ name: 'find-id' }">아이디 찾기</RouterLink>
       <RouterLink :to="{ name: 'password-reset' }">비밀번호 찾기</RouterLink>
     </div>
   </div>

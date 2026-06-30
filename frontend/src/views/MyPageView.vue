@@ -2,6 +2,7 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import PasswordInput from '@/components/PasswordInput.vue'
 import { userApi } from '@/api/auth'
 import { useAuthStore } from '@/stores/auth'
 import { errorMessage, formatDate } from '@/utils/format'
@@ -125,15 +126,15 @@ async function withdraw() {
       <h3>비밀번호 변경</h3>
       <div class="field">
         <label>현재 비밀번호</label>
-        <input v-model="pw.current_password" type="password" class="input" />
+        <PasswordInput v-model="pw.current_password" autocomplete="current-password" />
       </div>
       <div class="field">
         <label>새 비밀번호 (8~64자, 대·소문자·숫자 포함)</label>
-        <input v-model="pw.new_password" type="password" class="input" />
+        <PasswordInput v-model="pw.new_password" autocomplete="new-password" />
       </div>
       <div class="field">
         <label>새 비밀번호 확인</label>
-        <input v-model="pw.confirm" type="password" class="input" />
+        <PasswordInput v-model="pw.confirm" autocomplete="new-password" />
       </div>
       <p v-if="pwMsg" class="success-text">{{ pwMsg }}</p>
       <p v-if="pwErr" class="error-text">{{ pwErr }}</p>
@@ -144,7 +145,7 @@ async function withdraw() {
       <h3>회원 탈퇴</h3>
       <p class="muted">탈퇴 시 계정이 비활성화됩니다. 비밀번호를 입력해 확인하세요.</p>
       <div class="field">
-        <input v-model="deletePw" type="password" class="input" placeholder="비밀번호" />
+        <PasswordInput v-model="deletePw" placeholder="비밀번호" autocomplete="current-password" />
       </div>
       <p v-if="deleteErr" class="error-text">{{ deleteErr }}</p>
       <button class="btn btn-danger" @click="withdraw">회원 탈퇴</button>

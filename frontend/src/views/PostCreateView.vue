@@ -50,6 +50,11 @@ async function submit() {
     <div class="field">
       <label>첨부파일</label>
       <FileUploader v-model="files" />
+      <p class="file-guide">
+        ※ 파일 1개당 <b>10MB 이하</b>만 첨부할 수 있습니다. 허용 형식:
+        jpg · jpeg · png · gif · webp · pdf · txt · csv · doc · docx · xls ·
+        xlsx · ppt · pptx · zip · hwp (그 외 형식은 업로드되지 않습니다.)
+      </p>
     </div>
     <p v-if="error" class="error-text">{{ error }}</p>
     <div class="row">
@@ -63,5 +68,14 @@ async function submit() {
 <style scoped>
 h2 {
   margin: 0 0 20px;
+}
+.file-guide {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--danger);
+}
+.file-guide b {
+  font-weight: 700;
 }
 </style>
