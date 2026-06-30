@@ -1,0 +1,220 @@
+/* ===========================================================
+   달구 회사소개 랜딩 — 디자인 시스템 (Apple 스타일)
+   모든 규칙은 .lp 스코프 아래로 한정해 게시판 스타일과 분리.
+   =========================================================== */
+
+.lp {
+  /* --- 색상 토큰 --- */
+  --c-bg: #ffffff;
+  --c-bg-soft: #f5f5f7; /* Apple 그레이 */
+  --c-bg-dark: #1d1d1f; /* Apple 니어블랙 */
+  --c-text: #1d1d1f;
+  --c-text-2: #6e6e73;
+  --c-text-3: #86868b;
+  --c-line: #d2d2d7;
+  --c-line-soft: #e8e8ed;
+  --c-primary: #0071e3; /* Apple 블루 */
+  --c-primary-press: #0077ed;
+  --c-red: #ff3b30; /* 응급/심박 */
+  --c-green: #34c759; /* 상태 양호 */
+
+  /* --- 라운드 --- */
+  --r-lg: 24px;
+  --r-md: 18px;
+  --r-sm: 12px;
+
+  color: var(--c-text);
+  background: var(--c-bg);
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'SF Pro Display',
+    'SF Pro Text', 'Apple SD Gothic Neo', 'Segoe UI', 'Malgun Gothic', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
+}
+
+/* ===== 레이아웃 ===== */
+.lp-container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 22px;
+}
+.lp-container--wide {
+  max-width: 1120px;
+}
+
+.lp-section {
+  padding: clamp(72px, 11vw, 132px) 0;
+  background: var(--c-bg);
+}
+.lp-section--soft {
+  background: var(--c-bg-soft);
+}
+.lp-section--dark {
+  background: var(--c-bg-dark);
+  color: #f5f5f7;
+}
+.lp-section--tight {
+  padding: clamp(56px, 8vw, 96px) 0;
+}
+
+/* ===== 타이포 ===== */
+.lp-eyebrow {
+  font-size: clamp(16px, 2vw, 20px);
+  font-weight: 600;
+  color: var(--c-primary);
+  margin: 0 0 14px;
+  letter-spacing: 0;
+}
+.lp-section--dark .lp-eyebrow {
+  color: #2997ff; /* 다크 위 블루 톤업 */
+}
+
+.lp-h1 {
+  font-size: clamp(40px, 7.2vw, 76px);
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  margin: 0 0 22px;
+}
+.lp-h2 {
+  font-size: clamp(28px, 4.6vw, 50px);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 18px;
+}
+.lp-h3 {
+  font-size: clamp(20px, 2.6vw, 27px);
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin: 0 0 10px;
+}
+.lp-lead {
+  font-size: clamp(17px, 2.3vw, 22px);
+  line-height: 1.5;
+  color: var(--c-text-2);
+  margin: 0 auto;
+  font-weight: 400;
+}
+.lp-section--dark .lp-lead {
+  color: #a1a1a6;
+}
+.lp-center {
+  text-align: center;
+}
+.lp-center .lp-lead {
+  max-width: 680px;
+}
+
+/* ===== 버튼 / 링크 ===== */
+.lp-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.lp-center .lp-actions {
+  justify-content: center;
+}
+.lp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 22px;
+  border-radius: 980px;
+  font-size: 16px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  background: transparent;
+  transition: 0.22s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.lp-btn--primary {
+  background: var(--c-primary);
+  color: #fff;
+}
+.lp-btn--primary:hover {
+  background: var(--c-primary-press);
+  transform: translateY(-1px);
+}
+.lp-btn--ghost {
+  border-color: var(--c-primary);
+  color: var(--c-primary);
+}
+.lp-btn--ghost:hover {
+  background: rgba(0, 113, 227, 0.08);
+}
+.lp-section--dark .lp-btn--ghost {
+  border-color: #2997ff;
+  color: #2997ff;
+}
+
+.lp-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--c-primary);
+  font-size: clamp(15px, 1.8vw, 19px);
+  font-weight: 500;
+}
+.lp-section--dark .lp-link {
+  color: #2997ff;
+}
+.lp-link::after {
+  content: '›';
+  font-size: 1.2em;
+  line-height: 1;
+  transition: transform 0.2s;
+}
+.lp-link:hover::after {
+  transform: translateX(3px);
+}
+.lp-links-row {
+  display: flex;
+  gap: 26px;
+  flex-wrap: wrap;
+}
+.lp-center .lp-links-row {
+  justify-content: center;
+}
+
+/* ===== 배지 / 칩 ===== */
+.lp-badge {
+  display: inline-block;
+  padding: 7px 16px;
+  border-radius: 980px;
+  font-size: 14px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #f5f5f7;
+}
+
+/* ===== 카드 ===== */
+.lp-card {
+  background: #fff;
+  border-radius: var(--r-lg);
+  padding: 28px;
+  border: 1px solid var(--c-line-soft);
+}
+.lp-section--soft .lp-card {
+  border-color: transparent;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* ===== 헤더 묶음 간격 ===== */
+.lp-head {
+  margin-bottom: 44px;
+}
+.lp-head .lp-actions,
+.lp-head .lp-links-row {
+  margin-top: 22px;
+}
+
+/* ===== 유틸 ===== */
+.lp-mt-l {
+  margin-top: 56px;
+}
+.lp-mt-m {
+  margin-top: 36px;
+}
