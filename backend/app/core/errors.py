@@ -31,3 +31,4 @@ def unauthorized(detail: str = "인증이 필요합니다.", code: str = "UNAUTH
 
 def too_many(detail: str, code: str = "TOO_MANY_ATTEMPTS") -> AppError:
     return AppError(status.HTTP_429_TOO_MANY_REQUESTS, detail, code)
+
