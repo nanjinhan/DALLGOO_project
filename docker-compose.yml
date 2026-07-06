@@ -57,6 +57,15 @@ services:
         condition: service_healthy
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/app
 
+  frontend:
+    build: ./frontend
+    container_name: dallgoo-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
 volumes:
   db_data:
   uploads:
