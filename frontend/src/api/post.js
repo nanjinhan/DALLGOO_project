@@ -2,6 +2,7 @@ import client from './client'
 
 export const postApi = {
   list: (params) => client.get('/posts', { params }),
+  suggest: (keyword) => client.get('/posts/suggest', { params: { keyword } }),
   detail: (id) => client.get(`/posts/${id}`),
   create: (formData) =>
     client.post('/posts', formData, {

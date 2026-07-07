@@ -4,9 +4,11 @@ import { RouterLink, useRouter } from 'vue-router'
 
 import NotificationBell from '@/components/NotificationBell.vue'
 import { useAuthStore } from '@/stores/auth'
+import { useTheme } from '@/composables/useTheme'
 
 const auth = useAuthStore()
 const router = useRouter()
+const { theme, toggle: toggleTheme } = useTheme()
 
 const scrolled = ref(false)
 const onScroll = () => (scrolled.value = window.scrollY > 8)
@@ -39,6 +41,13 @@ async function onLogout() {
       </nav>
 
       <div class="gnav-right">
+        <button
+          class="theme-btn"
+          :title="theme === 'dark' ? '라이트 모드' : '다크 모드'"
+          @click="toggleTheme"
+        >
+          {{ theme === 'dark' ? '☀️' : '🌙' }}
+        </button>
         <template v-if="auth.isLoggedIn">
           <NotificationBell />
           <RouterLink :to="{ name: 'post-create' }" class="gn-btn">글쓰기</RouterLink>
@@ -111,6 +120,18 @@ async function onLogout() {
   display: flex;
   align-items: center;
   gap: 16px;
+}
+.theme-btn {
+  border: none;
+  background: none;
+  font-size: 18px;
+  line-height: 1;
+  padding: 4px;
+  border-radius: 8px;
+  transition: transform 0.15s;
+}
+.theme-btn:hover {
+  transform: scale(1.15);
 }
 .gn-link {
   border: none;

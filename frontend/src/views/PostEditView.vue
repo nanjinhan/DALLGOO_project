@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 
 import { fileApi, postApi } from '@/api/post'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from '@/composables/useToast'
 import { errorMessage, formatSize } from '@/utils/format'
 
 const props = defineProps({
@@ -12,9 +13,11 @@ const props = defineProps({
 
 const auth = useAuthStore()
 const router = useRouter()
+const toast = useToast()
 
 const title = ref('')
 const content = ref('')
+const isSecret = ref(false)
 const existingFiles = ref([])
 const loading = ref(true)
 const busy = ref(false)
@@ -30,6 +33,7 @@ async function load() {
     }
     title.value = data.title
     content.value = data.content
+    isSecret.value = data.is_secret
     existingFiles.value = data.files || []
   } catch (e) {
     error.value = errorMessage(e)
@@ -56,10 +60,16 @@ async function submit() {
   }
   busy.value = true
   try {
-    await postApi.update(props.id, { title: title.value, content: content.value })
+    await postApi.update(props.id, {
+      title: title.value,
+      content: content.value,
+      is_secret: isSecret.value,
+    })
+    toast.success('수정되었습니다.')
     router.push({ name: 'post-detail', params: { id: props.id } })
   } catch (e) {
     error.value = errorMessage(e, '수정에 실패했습니다.')
+    toast.error(error.value)
   } finally {
     busy.value = false
   }
@@ -90,6 +100,12 @@ onMounted(load)
             <button class="remove" @click="removeFile(f.id)">삭제</button>
           </li>
         </ul>
+      </div>
+      <div class="field">
+        <label class="secret-check">
+          <input v-model="isSecret" type="checkbox" />
+          <span>🔒 비밀글 (작성자와 관리자만 볼 수 있어요 — 1:1 문의)</span>
+        </label>
       </div>
       <p v-if="error" class="error-text">{{ error }}</p>
       <div class="row">
@@ -127,5 +143,19 @@ h2 {
   color: var(--danger);
   font-size: 13px;
   font-weight: 600;
+}
+.secret-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+}
+.secret-check input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
 }
 </style>

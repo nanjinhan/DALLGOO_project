@@ -4,11 +4,28 @@
   --primary-dark: #0077ed;
   --bg: #f5f5f7;
   --card: #ffffff;
+  --surface: #ffffff;
+  --hover: #f5f5f7;
   --border: #d2d2d7;
   --border-soft: #e8e8ed;
   --text: #1d1d1f;
   --muted: #86868b;
   --danger: #ff3b30;
+}
+
+/* 다크모드 — 루트에 data-theme="dark" 가 붙으면 색상 변수 교체 */
+:root[data-theme='dark'] {
+  --primary: #2997ff;
+  --primary-dark: #0a84ff;
+  --bg: #000000;
+  --card: #1c1c1e;
+  --surface: #2c2c2e;
+  --hover: #2c2c2e;
+  --border: #3a3a3c;
+  --border-soft: #2c2c2e;
+  --text: #f5f5f7;
+  --muted: #98989d;
+  --danger: #ff453a;
 }
 
 * {
@@ -60,14 +77,14 @@ button {
   padding: 9px 18px;
   border: 1px solid var(--border);
   border-radius: 980px;
-  background: #fff;
+  background: var(--card);
   font-size: 14px;
   font-weight: 600;
   color: var(--text);
   transition: 0.18s;
 }
 .btn:hover {
-  background: #f5f5f7;
+  background: var(--hover);
 }
 .btn-primary {
   background: var(--primary);
@@ -99,7 +116,7 @@ button {
   border-radius: 11px;
   font-size: 14px;
   font-family: inherit;
-  background: #fff;
+  background: var(--card);
   color: var(--text);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
@@ -147,4 +164,22 @@ button {
   color: #2b8a3e;
   font-size: 13px;
   margin-top: 6px;
+}
+
+/* ===== 다크모드: 스코프 컴포넌트 중 하드코딩 배경 보정 ===== */
+:root[data-theme='dark'] .gnav {
+  background: rgba(28, 28, 30, 0.72);
+}
+:root[data-theme='dark'] .post-card {
+  background: var(--card);
+}
+:root[data-theme='dark'] .tbl th {
+  background: var(--surface);
+}
+:root[data-theme='dark'] .files,
+:root[data-theme='dark'] .feed {
+  background: var(--surface);
+}
+:root[data-theme='dark'] .author {
+  color: var(--muted);
 }

@@ -4,6 +4,7 @@ import { RouterView, useRoute, useRouter } from 'vue-router'
 
 import GlobalFooter from '@/components/GlobalFooter.vue'
 import GlobalNav from '@/components/GlobalNav.vue'
+import ToastContainer from '@/components/ToastContainer.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
@@ -31,6 +32,7 @@ onUnmounted(() => window.removeEventListener('auth:logout', handleForcedLogout))
   </main>
 
   <GlobalFooter />
+  <ToastContainer />
 </template>
 
 <style scoped>

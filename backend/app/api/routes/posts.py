@@ -20,17 +20,28 @@ router = APIRouter(prefix="/posts", tags=["posts"])
 def create_post(
     title: str = Form(..., min_length=1, max_length=200),
     content: str = Form(..., min_length=1),
+    is_secret: bool = Form(default=False),
     files: list[UploadFile] | None = File(default=None),
     current: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    post = post_crud.create(db, user_id=current.id, title=title, content=content)
+    post = post_crud.create(
+        db, user_id=current.id, title=title, content=content, is_secret=is_secret
+    )
     if files:
         for upload in files:
             if upload and upload.filename:
                 file_crud.save_upload(db, post.id, upload)
-    publish_activity("post", current.nickname, f"'{title[:30]}' 글을 작성했습니다.")
+    # 비밀글(문의)은 활동 피드에 노출하지 않는다
+    if not is_secret:
+        publish_activity("post", current.nickname, f"'{title[:30]}' 글을 작성했습니다.")
     return _to_detail(db, post, current)
+
+
+@router.get("/suggest")
+def suggest_posts(keyword: str = Query(..., min_length=1), db: Session = Depends(get_db)):
+    """검색 자동완성 — 제목 후보 목록."""
+    return {"suggestions": post_crud.suggest_titles(db, keyword.strip())}
 
 
 @router.get("", response_model=Page[PostListItem])
@@ -40,6 +51,7 @@ def list_posts(
     sort: str = Query("latest"),
     search_type: str | None = Query(None),
     keyword: str | None = Query(None),
+    current: User | None = Depends(get_optional_user),
     db: Session = Depends(get_db),
 ):
     rows, total = post_crud.list_posts(
@@ -50,18 +62,25 @@ def list_posts(
         search_type=search_type,
         keyword=keyword,
     )
-    items = [
-        PostListItem(
-            id=post.id,
-            title=post.title,
-            author={"id": post.author.id, "nickname": post.author.nickname},
-            view_count=post.view_count,
-            like_count=like_cnt,
-            comment_count=comment_cnt,
-            created_at=post.created_at,
+    items = []
+    for post, like_cnt, comment_cnt in rows:
+        # 비밀글은 작성자/관리자만 제목을 볼 수 있고, 그 외엔 가린다.
+        can_view = current is not None and (
+            current.id == post.user_id or current.is_admin
         )
-        for post, like_cnt, comment_cnt in rows
-    ]
+        title = post.title if (not post.is_secret or can_view) else "🔒 비밀글입니다"
+        items.append(
+            PostListItem(
+                id=post.id,
+                title=title,
+                author={"id": post.author.id, "nickname": post.author.nickname},
+                view_count=post.view_count,
+                like_count=like_cnt,
+                comment_count=comment_cnt,
+                is_secret=post.is_secret,
+                created_at=post.created_at,
+            )
+        )
     total_pages = (total + size - 1) // size
     return Page(items=items, page=page, size=size, total=total, total_pages=total_pages)
 
@@ -75,6 +94,13 @@ def get_post(
     post = post_crud.get_with_files(db, post_id)
     if post is None:
         raise not_found("게시글을 찾을 수 없습니다.", "POST_NOT_FOUND")
+    # 비밀글은 작성자와 관리자만 열람 가능
+    if post.is_secret:
+        can_view = current is not None and (
+            current.id == post.user_id or current.is_admin
+        )
+        if not can_view:
+            raise forbidden("비밀글입니다. 작성자와 관리자만 볼 수 있습니다.", "SECRET_POST")
     post_crud.increment_view(db, post)
     return _to_detail(db, post, current)
 
@@ -91,7 +117,13 @@ def update_post(
         raise not_found("게시글을 찾을 수 없습니다.", "POST_NOT_FOUND")
     if post.user_id != current.id:
         raise forbidden("본인 글만 수정할 수 있습니다.", "NOT_OWNER")
-    post_crud.update(db, post, title=payload.title, content=payload.content)
+    post_crud.update(
+        db,
+        post,
+        title=payload.title,
+        content=payload.content,
+        is_secret=payload.is_secret,
+    )
     return _to_detail(db, post, current)
 
 
@@ -160,6 +192,7 @@ def _to_detail(db: Session, post, current: User | None) -> PostDetail:
         like_count=post_crud.like_count(db, post.id),
         liked_by_me=liked,
         comment_count=post_crud.comment_count(db, post.id),
+        is_secret=post.is_secret,
         files=[
             {
                 "id": f.id,

@@ -28,6 +28,7 @@ class PostCreate(BaseModel):
 class PostUpdate(BaseModel):
     title: str | None = Field(default=None, min_length=1, max_length=200)
     content: str | None = Field(default=None, min_length=1)
+    is_secret: bool | None = None
 
 
 class PostListItem(BaseModel):
@@ -41,6 +42,7 @@ class PostListItem(BaseModel):
     view_count: int
     like_count: int = 0
     comment_count: int = 0
+    is_secret: bool = False
     created_at: datetime
 
 
@@ -55,6 +57,7 @@ class PostDetail(BaseModel):
     like_count: int = 0
     liked_by_me: bool = False
     comment_count: int = 0
+    is_secret: bool = False
     files: list[FileOut] = []
     created_at: datetime
     updated_at: datetime

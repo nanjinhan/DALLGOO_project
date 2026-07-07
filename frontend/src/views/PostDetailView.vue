@@ -7,6 +7,7 @@ import LikeButton from '@/components/LikeButton.vue'
 import { adminApi } from '@/api/admin'
 import { fileApi, postApi } from '@/api/post'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from '@/composables/useToast'
 import { errorMessage, formatDate, formatSize } from '@/utils/format'
 
 const props = defineProps({
@@ -15,6 +16,7 @@ const props = defineProps({
 
 const auth = useAuthStore()
 const router = useRouter()
+const toast = useToast()
 
 const post = ref(null)
 const loading = ref(true)
@@ -63,9 +65,11 @@ async function remove() {
   if (!confirm('게시글을 삭제할까요? 첨부파일도 함께 삭제됩니다.')) return
   try {
     await postApi.remove(props.id)
+    toast.success('게시글이 삭제되었습니다.')
     router.push({ name: 'posts' })
   } catch (e) {
     error.value = errorMessage(e)
+    toast.error(error.value)
   }
 }
 
@@ -73,9 +77,11 @@ async function adminRemove() {
   if (!confirm('[관리자] 이 게시글을 강제 삭제할까요?')) return
   try {
     await adminApi.deletePost(props.id)
+    toast.success('게시글을 삭제했습니다.')
     router.push({ name: 'posts' })
   } catch (e) {
     error.value = errorMessage(e)
+    toast.error(error.value)
   }
 }
 
@@ -89,7 +95,10 @@ onMounted(load)
 
     <template v-else-if="post">
       <article class="card">
-        <h1 class="title">{{ post.title }}</h1>
+        <h1 class="title">
+          <span v-if="post.is_secret" class="secret-badge">🔒 비밀글</span>
+          {{ post.title }}
+        </h1>
         <div class="meta">
           <span class="author">{{ post.author?.nickname }}</span>
           <span class="dot">·</span>
@@ -153,6 +162,17 @@ onMounted(load)
 .title {
   font-size: 24px;
   margin: 0 0 12px;
+}
+.secret-badge {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--danger);
+  background: rgba(255, 59, 48, 0.1);
+  padding: 3px 9px;
+  border-radius: 8px;
+  margin-right: 8px;
+  vertical-align: middle;
 }
 .meta {
   display: flex;

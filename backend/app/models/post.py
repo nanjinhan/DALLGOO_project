@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, ForeignKey, Integer, String, Text
+from sqlalchemy import BigInteger, Boolean, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base, TimestampMixin
@@ -17,6 +17,8 @@ class Post(Base, TimestampMixin):
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     view_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    # 비밀글(1:1 문의): 작성자와 관리자만 열람 가능
+    is_secret: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     author: Mapped["User"] = relationship(back_populates="posts")
     comments: Mapped[list["Comment"]] = relationship(

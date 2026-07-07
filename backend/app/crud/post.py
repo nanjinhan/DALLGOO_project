@@ -33,8 +33,10 @@ def get_with_files(db: Session, post_id: int) -> Post | None:
     )
 
 
-def create(db: Session, *, user_id: int, title: str, content: str) -> Post:
-    post = Post(user_id=user_id, title=title, content=content)
+def create(
+    db: Session, *, user_id: int, title: str, content: str, is_secret: bool = False
+) -> Post:
+    post = Post(user_id=user_id, title=title, content=content, is_secret=is_secret)
     db.add(post)
     db.commit()
     db.refresh(post)
@@ -42,15 +44,41 @@ def create(db: Session, *, user_id: int, title: str, content: str) -> Post:
 
 
 def update(
-    db: Session, post: Post, *, title: str | None, content: str | None
+    db: Session,
+    post: Post,
+    *,
+    title: str | None,
+    content: str | None,
+    is_secret: bool | None = None,
 ) -> Post:
     if title is not None:
         post.title = title
     if content is not None:
         post.content = content
+    if is_secret is not None:
+        post.is_secret = is_secret
     db.commit()
     db.refresh(post)
     return post
+
+
+def suggest_titles(db: Session, keyword: str, limit: int = 8) -> list[str]:
+    """검색 자동완성: 키워드가 제목에 포함된 공개글 제목을 최신순으로 반환."""
+    like_kw = f"%{keyword}%"
+    rows = db.scalars(
+        select(Post.title)
+        .where(Post.title.like(like_kw), Post.is_secret.is_(False))
+        .order_by(desc(Post.created_at))
+        .limit(limit)
+    ).all()
+    # 중복 제목 제거(순서 유지)
+    seen: set[str] = set()
+    result: list[str] = []
+    for t in rows:
+        if t not in seen:
+            seen.add(t)
+            result.append(t)
+    return result
 
 
 def increment_view(db: Session, post: Post) -> None:

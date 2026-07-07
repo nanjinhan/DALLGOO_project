@@ -9,7 +9,10 @@ defineProps({
 
 <template>
   <RouterLink :to="{ name: 'post-detail', params: { id: post.id } }" class="post-card">
-    <div class="title">{{ post.title }}</div>
+    <div class="title">
+      <span v-if="post.is_secret" class="lock" title="비밀글">🔒</span>
+      {{ post.title }}
+    </div>
     <div class="meta">
       <span class="author">{{ post.author?.nickname }}</span>
       <span class="dot">·</span>
@@ -41,6 +44,10 @@ defineProps({
   font-size: 16px;
   font-weight: 700;
   margin-bottom: 8px;
+}
+.lock {
+  font-size: 13px;
+  margin-right: 2px;
 }
 .meta {
   display: flex;

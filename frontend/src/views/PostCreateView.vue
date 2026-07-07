@@ -4,12 +4,15 @@ import { useRouter } from 'vue-router'
 
 import FileUploader from '@/components/FileUploader.vue'
 import { postApi } from '@/api/post'
+import { useToast } from '@/composables/useToast'
 import { errorMessage } from '@/utils/format'
 
 const router = useRouter()
+const toast = useToast()
 
 const title = ref('')
 const content = ref('')
+const isSecret = ref(false)
 const files = ref([])
 const busy = ref(false)
 const error = ref('')
@@ -25,11 +28,14 @@ async function submit() {
     const fd = new FormData()
     fd.append('title', title.value)
     fd.append('content', content.value)
+    fd.append('is_secret', isSecret.value)
     files.value.forEach((f) => fd.append('files', f))
     const { data } = await postApi.create(fd)
+    toast.success(isSecret.value ? '문의(비밀글)가 등록되었습니다.' : '글이 등록되었습니다.')
     router.push({ name: 'post-detail', params: { id: data.id } })
   } catch (e) {
     error.value = errorMessage(e, '글 작성에 실패했습니다.')
+    toast.error(error.value)
   } finally {
     busy.value = false
   }
@@ -56,6 +62,12 @@ async function submit() {
         xlsx · ppt · pptx · zip · hwp (그 외 형식은 업로드되지 않습니다.)
       </p>
     </div>
+    <div class="field">
+      <label class="secret-check">
+        <input v-model="isSecret" type="checkbox" />
+        <span>🔒 비밀글 (작성자와 관리자만 볼 수 있어요 — 1:1 문의)</span>
+      </label>
+    </div>
     <p v-if="error" class="error-text">{{ error }}</p>
     <div class="row">
       <button class="btn" @click="router.back()">취소</button>
@@ -77,5 +89,19 @@ h2 {
 }
 .file-guide b {
   font-weight: 700;
+}
+.secret-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+}
+.secret-check input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
 }
 </style>

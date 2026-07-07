@@ -3,9 +3,11 @@ import { onMounted, onUnmounted, ref } from 'vue'
 
 import { adminApi } from '@/api/admin'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from '@/composables/useToast'
 import { errorMessage, formatDate } from '@/utils/format'
 
 const auth = useAuthStore()
+const toast = useToast()
 const users = ref([])
 const loading = ref(true)
 const error = ref('')
@@ -50,8 +52,9 @@ async function toggleActive(u) {
   try {
     await adminApi.setActive(u.id, next)
     u.is_active = next
+    toast.success(next ? '정지를 해제했습니다.' : '회원을 정지했습니다.')
   } catch (e) {
-    alert(errorMessage(e))
+    toast.error(errorMessage(e))
   }
 }
 
