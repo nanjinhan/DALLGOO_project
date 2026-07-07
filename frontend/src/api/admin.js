@@ -6,6 +6,7 @@ export const adminApi = {
     client.patch(`/admin/users/${id}/active`, null, { params: { active } }),
   deletePost: (id) => client.delete(`/admin/posts/${id}`),
   deleteComment: (id) => client.delete(`/admin/comments/${id}`),
+  activities: () => client.get('/admin/activities'),
 }
 
 export const notificationApi = {

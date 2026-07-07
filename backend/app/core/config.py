@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     # --- RabbitMQ (이메일 발송 큐) ---
     RABBITMQ_URL: str = "amqp://dallgoo:dallgoo_mq_pw_2026@rabbitmq:5672/"
 
+    # --- Kafka (활동 로그 이벤트 스트림) ---
+    KAFKA_BOOTSTRAP_SERVERS: str = "kafka:9092"
+
     # --- 로그인 잠금(rate limiting) ---
     LOGIN_MAX_ATTEMPTS: int = 5  # 이 횟수 넘게 틀리면 잠금
     LOGIN_LOCK_MINUTES: int = 10  # 잠금 시간(분)

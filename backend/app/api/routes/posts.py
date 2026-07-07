@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_current_user, get_optional_user
 from app.core.database import get_db
 from app.core.errors import forbidden, not_found
+from app.core.events import publish_activity
 from app.crud import file as file_crud
 from app.crud import like as like_crud
 from app.crud import notification as notif_crud
@@ -28,6 +29,7 @@ def create_post(
         for upload in files:
             if upload and upload.filename:
                 file_crud.save_upload(db, post.id, upload)
+    publish_activity("post", current.nickname, f"'{title[:30]}' 글을 작성했습니다.")
     return _to_detail(db, post, current)
 
 
@@ -125,6 +127,9 @@ def like_post(
             type="post_like",
             message=f"{current.nickname}님이 회원님의 글을 좋아합니다.",
             post_id=post_id,
+        )
+        publish_activity(
+            "like", current.nickname, f"'{post.title[:30]}' 글을 좋아합니다."
         )
     return LikeResponse(liked=True, like_count=like_crud.post_like_count(db, post_id))
 

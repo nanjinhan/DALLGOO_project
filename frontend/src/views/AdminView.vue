@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 import { adminApi } from '@/api/admin'
 import { useAuthStore } from '@/stores/auth'
@@ -9,6 +9,17 @@ const auth = useAuthStore()
 const users = ref([])
 const loading = ref(true)
 const error = ref('')
+
+// --- 실시간 활동 피드 (Kafka → Redis → 5초 폴링) ---
+const activities = ref([])
+let feedTimer = null
+
+const ACTIVITY_ICON = {
+  post: '📝',
+  comment: '💬',
+  like: '❤️',
+  login: '🔑',
+}
 
 async function load() {
   loading.value = true
@@ -20,6 +31,15 @@ async function load() {
     error.value = errorMessage(e)
   } finally {
     loading.value = false
+  }
+}
+
+async function loadActivities() {
+  try {
+    const { data } = await adminApi.activities()
+    activities.value = data
+  } catch {
+    // 피드는 부가기능 — 실패해도 조용히 무시
   }
 }
 
@@ -35,12 +55,41 @@ async function toggleActive(u) {
   }
 }
 
-onMounted(load)
+onMounted(() => {
+  load()
+  loadActivities()
+  feedTimer = setInterval(loadActivities, 5000) // 5초마다 갱신
+})
+
+onUnmounted(() => {
+  if (feedTimer) clearInterval(feedTimer)
+})
 </script>
 
 <template>
   <div class="admin">
     <h2>관리자 · 회원 관리</h2>
+
+    <!-- 실시간 활동 피드 (Kafka) -->
+    <div class="feed card">
+      <div class="feed-head">
+        <span class="live-dot" />
+        실시간 활동
+        <span class="muted small">· 5초마다 갱신</span>
+      </div>
+      <ul v-if="activities.length" class="feed-list">
+        <li v-for="(a, i) in activities" :key="i">
+          <span class="ico">{{ ACTIVITY_ICON[a.type] || '•' }}</span>
+          <span class="who">{{ a.actor }}</span>
+          <span class="what">{{ a.detail }}</span>
+          <span class="when muted">{{ formatDate(a.at) }}</span>
+        </li>
+      </ul>
+      <p v-else class="muted small" style="padding: 8px 4px">
+        아직 활동이 없습니다. 글쓰기·댓글·좋아요·로그인을 하면 여기에 실시간으로 표시됩니다.
+      </p>
+    </div>
+
     <p class="muted" style="margin-bottom: 16px">
       총 {{ users.length }}명 · 정지된 회원은 로그인할 수 없습니다.
     </p>
@@ -101,6 +150,63 @@ onMounted(load)
 <style scoped>
 .admin h2 {
   margin: 0 0 6px;
+}
+.feed {
+  padding: 14px 16px;
+  margin: 14px 0 18px;
+}
+.feed-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e03131;
+  box-shadow: 0 0 0 0 rgba(224, 49, 49, 0.5);
+  animation: pulse 1.6s infinite;
+}
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(224, 49, 49, 0.5); }
+  70% { box-shadow: 0 0 0 7px rgba(224, 49, 49, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(224, 49, 49, 0); }
+}
+.feed-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 260px;
+  overflow-y: auto;
+}
+.feed-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 2px;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 13.5px;
+}
+.feed-list li:last-child {
+  border-bottom: none;
+}
+.feed-list .ico {
+  flex: none;
+}
+.feed-list .who {
+  font-weight: 700;
+}
+.feed-list .what {
+  color: var(--text);
+}
+.feed-list .when {
+  margin-left: auto;
+  font-size: 12px;
+  white-space: nowrap;
 }
 .table-wrap {
   padding: 0;

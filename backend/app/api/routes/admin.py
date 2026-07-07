@@ -1,10 +1,14 @@
+import json
+
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.activity_consumer import RECENT_KEY
 from app.api.deps import get_admin_user
 from app.core.database import get_db
 from app.core.errors import bad_request, not_found
+from app.core.redis_client import redis_client
 from app.crud import comment as comment_crud
 from app.crud import post as post_crud
 from app.crud import user as user_crud
@@ -13,6 +17,19 @@ from app.schemas.common import Message
 from app.schemas.user import UserAdminOut
 
 router = APIRouter(prefix="/admin", tags=["admin"])
+
+
+@router.get("/activities")
+def list_activities(_: User = Depends(get_admin_user)):
+    """Kafka 소비자가 Redis에 쌓아둔 최근 활동을 최신순으로 반환."""
+    raw = redis_client.lrange(RECENT_KEY, 0, 49)
+    activities = []
+    for item in raw:
+        try:
+            activities.append(json.loads(item))
+        except (ValueError, TypeError):
+            continue
+    return activities
 
 
 @router.get("/users", response_model=list[UserAdminOut])

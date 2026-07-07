@@ -10,6 +10,7 @@ from app.core import security_store as store
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.errors import bad_request, conflict, forbidden, too_many, unauthorized
+from app.core.events import publish_activity
 from app.core.queue import publish_email_job
 from app.core.security import (
     REFRESH_TOKEN_TYPE,
@@ -174,6 +175,7 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
 
     # 3) 성공 → 실패 카운트 초기화
     store.login_reset(payload.username)
+    publish_activity("login", user.nickname, "로그인했습니다.")
     access = create_access_token(user.id)
     refresh = create_refresh_token(user.id)
     token_crud.store_refresh(db, user.id, refresh)
