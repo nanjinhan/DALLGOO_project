@@ -9,8 +9,8 @@ from sqlalchemy.orm import Session
 from app.core import security_store as store
 from app.core.config import settings
 from app.core.database import get_db
-from app.core.email import send_email
 from app.core.errors import bad_request, conflict, forbidden, too_many, unauthorized
+from app.core.queue import publish_email_job
 from app.core.security import (
     REFRESH_TOKEN_TYPE,
     create_access_token,
@@ -112,7 +112,7 @@ def send_email_code(payload: EmailRequest, db: Session = Depends(get_db)):
             f"인증번호는 {wait}초 후 다시 받을 수 있습니다.", "RESEND_TOO_SOON"
         )
     code = store.issue_code(email)
-    send_email(
+    publish_email_job(
         email,
         "[달구 게시판] 이메일 인증번호",
         f"인증번호는 [{code}] 입니다.\n"
@@ -136,7 +136,7 @@ def find_username(payload: EmailRequest, db: Session = Depends(get_db)):
     user = user_crud.get_by_email(db, payload.email)
     # user enumeration 방지 → 존재 여부와 무관하게 같은 메시지
     if user:
-        send_email(
+        publish_email_job(
             payload.email,
             "[달구 게시판] 아이디 안내",
             f"회원님의 아이디는 '{user.username}' 입니다.",

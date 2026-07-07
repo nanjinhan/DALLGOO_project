@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_current_user, get_optional_user
 from app.core.config import settings
 from app.core.database import get_db
-from app.core.email import send_email
 from app.core.errors import bad_request, forbidden, not_found
+from app.core.queue import publish_email_job
 from app.crud import comment as comment_crud
 from app.crud import like as like_crud
 from app.crud import notification as notif_crud
@@ -125,7 +125,7 @@ def create_comment(
         )
     # 이메일 알림(메일 설정된 경우, 글 작성자에게)
     if settings.email_enabled and post.user_id != current.id and post.author:
-        send_email(
+        publish_email_job(
             post.author.email,
             "[달구 게시판] 새 댓글 알림",
             f"'{post.title}' 글에 {current.nickname}님이 댓글을 남겼습니다.\n\n"

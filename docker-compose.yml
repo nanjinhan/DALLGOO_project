@@ -37,6 +37,22 @@ services:
       timeout: 5s
       retries: 10
 
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: dallgoo-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-dallgoo}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-dallgoo_mq_pw}
+    ports:
+      - "5672:5672"     # AMQP (백엔드/워커가 여기로 연결)
+      - "15672:15672"   # 관리자 웹 UI (http://서버:15672)
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   backend:
     build: ./backend
     container_name: dallgoo-backend
@@ -55,7 +71,21 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/app
+
+  worker:
+    build: ./backend
+    container_name: dallgoo-worker
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./backend:/app
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    command: python -m app.worker
 
   frontend:
     build: ./frontend

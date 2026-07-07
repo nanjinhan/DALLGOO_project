@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     # --- Redis (메모리 DB: rate limit / 인증번호) ---
     REDIS_URL: str = "redis://redis:6379/0"
 
+    # --- RabbitMQ (이메일 발송 큐) ---
+    RABBITMQ_URL: str = "amqp://dallgoo:dallgoo_mq_pw_2026@rabbitmq:5672/"
+
     # --- 로그인 잠금(rate limiting) ---
     LOGIN_MAX_ATTEMPTS: int = 5  # 이 횟수 넘게 틀리면 잠금
     LOGIN_LOCK_MINUTES: int = 10  # 잠금 시간(분)
