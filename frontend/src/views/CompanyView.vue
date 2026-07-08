@@ -2,6 +2,7 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 
 import ImageSlot from '@/components/company/ImageSlot.vue'
+import MapEmbed from '@/components/company/MapEmbed.vue'
 import WelcomePopup from '@/components/WelcomePopup.vue'
 
 // 상단 스크롤 진행률 표시줄(Scroll Progress Bar)
@@ -91,11 +92,36 @@ const services = [
 const companyInfo = [
   ['대표자', '박시은'],
   ['설립일', '2024년 8월 20일'],
-  ['본사', '광주광역시 동구 남문로 600 (소태동)'],
+  ['본사', '광주광역시 북구 치촌마을길 1-6 (인공지능 산업융합 사업단 512호)'],
   ['업종', '소프트웨어 개발·공급 · 앰뷸런스 서비스업'],
   ['규모', '중소기업 · 임직원 약 10~12명'],
   ['분류', '벤처기업 · 특허 보유 · 딥테크 초기창업패키지 선정'],
 ]
+
+// 오시는 길 — 두 곳(본사 / 이송본부) 탭
+const locations = [
+  {
+    key: 'hq',
+    label: '본사',
+    address: '광주광역시 북구 치촌마을길 1-6',
+    detail: '인공지능 산업융합 사업단 512호',
+    transit: [
+      { ic: '🚌', k: '버스정류장', v: '인공지능융합사업단 인근 정류장 하차' },
+      { ic: '🚗', k: '자가용', v: '건물 내 주차장 이용 가능 (방문 시 주차 지원)' },
+    ],
+  },
+  {
+    key: 'transport',
+    label: '이송본부',
+    address: '광주광역시 동구 남문로 600',
+    detail: '2층',
+    transit: [
+      { ic: '🚇', k: '지하철 역', v: '소태역(광주 도시철도 1호선) 1번 출구 도보 2분' },
+      { ic: '🚌', k: '버스정류장', v: '소태역시외버스정류소 (남문로 575)' },
+    ],
+  },
+]
+const activeLoc = ref('hq')
 </script>
 
 <template>
@@ -232,36 +258,48 @@ const companyInfo = [
         <div class="lp-container lp-head">
           <p class="lp-eyebrow">오시는 길</p>
           <h2 class="lp-h2">달구를 만나러 오세요</h2>
-          <p class="lp-lead" style="margin: 0 auto">
-            광주광역시 동구 남문로 600 (소태동)
-          </p>
         </div>
 
         <div class="lp-container">
-          <div class="lp-card info">
-            <div class="info-row">
-              <div class="info-k">주소</div>
-              <div class="info-v">광주광역시 동구 남문로 600 (소태동)</div>
-            </div>
-            <div class="info-row">
-              <div class="info-k">대표전화</div>
-              <div class="info-v">062-236-1191</div>
-            </div>
-            <div class="info-row">
-              <div class="info-k">이메일</div>
-              <div class="info-v">contact@dallgoo.io</div>
-            </div>
-          </div>
-          <div class="lp-links-row lp-mt-m" style="justify-content: center">
-            <a
-              class="lp-link"
-              href="https://map.naver.com/p/search/광주광역시 동구 남문로 600"
-              target="_blank"
-              rel="noopener"
+          <!-- 위치 탭 -->
+          <div class="loc-tabs">
+            <button
+              v-for="l in locations"
+              :key="l.key"
+              class="loc-tab"
+              :class="{ on: activeLoc === l.key }"
+              @click="activeLoc = l.key"
             >
-              네이버 지도에서 보기 ›
-            </a>
+              {{ l.label }}
+            </button>
           </div>
+
+          <template v-for="l in locations" :key="l.key">
+            <div v-if="activeLoc === l.key" class="loc-panel">
+              <h3 class="loc-name">{{ l.label }}</h3>
+              <p class="loc-addr">{{ l.address }}, {{ l.detail }}</p>
+
+              <MapEmbed :address="l.address" height="360px" style="margin: 14px 0" />
+
+              <div class="loc-ways">
+                <div v-for="w in l.transit" :key="w.k" class="loc-way">
+                  <div class="loc-way-h">{{ w.ic }} {{ w.k }}</div>
+                  <div class="loc-way-v">{{ w.v }}</div>
+                </div>
+              </div>
+
+              <div class="lp-links-row lp-mt-m" style="justify-content: center">
+                <a
+                  class="lp-link"
+                  :href="`https://map.kakao.com/link/search/${l.address}`"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  카카오맵에서 크게 보기 ›
+                </a>
+              </div>
+            </div>
+          </template>
         </div>
       </section>
 
@@ -972,6 +1010,66 @@ const companyInfo = [
     border-left: none;
     border-top: 1px solid rgba(255, 255, 255, 0.12);
     padding-top: 28px;
+  }
+}
+
+/* ===== 오시는 길 — 위치 탭 ===== */
+.loc-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+.loc-tab {
+  padding: 9px 24px;
+  border: none;
+  border-radius: 999px;
+  background: var(--hover);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--muted);
+  transition: 0.15s;
+}
+.loc-tab.on {
+  background: var(--primary);
+  color: #fff;
+}
+.loc-panel {
+  text-align: left;
+}
+.loc-name {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0 0 6px;
+}
+.loc-addr {
+  color: var(--muted);
+  font-size: 14.5px;
+  margin: 0;
+}
+.loc-ways {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.loc-way {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.loc-way-h {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.loc-way-v {
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+@media (max-width: 620px) {
+  .loc-ways {
+    grid-template-columns: 1fr;
   }
 }
 </style>

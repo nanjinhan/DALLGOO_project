@@ -4,6 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>달구 게시판</title>
+    <script>
+      // Vue가 로드되기 전에 실행 — 새로고침/직접진입 시 항상 최상단에서 시작
+      if (window.location.hash) {
+        history.replaceState(null, '', window.location.pathname + window.location.search)
+      }
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual'
+      }
+    </script>
     <link
       rel="stylesheet"
       as="style"
