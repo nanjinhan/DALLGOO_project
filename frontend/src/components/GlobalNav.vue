@@ -129,9 +129,6 @@ async function onLogout() {
       </nav>
 
       <div class="gnav-right">
-        <a :href="`tel:${TEL}`" class="tel-btn">
-          <span class="tel-ic">📞</span>{{ TEL }}
-        </a>
         <button
           class="theme-btn"
           :title="theme === 'dark' ? '라이트 모드' : '다크 모드'"

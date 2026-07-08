@@ -484,14 +484,38 @@ const activeLoc = ref('hq')
         </div>
       </section>
 
-      <!-- ===== 파트너 CTA ===== -->
+      <!-- ===== 문의 ===== -->
       <section id="partner" class="lp-section lp-center">
+        <div class="lp-container lp-head">
+          <p class="lp-eyebrow">문의</p>
+          <h2 class="lp-h2">궁금한 점이 있으신가요?</h2>
+          <p class="lp-lead" style="margin: 0 auto">
+            전화 또는 1:1 온라인 문의로 편하게 연락 주세요.
+            병원·공공기관·민간업체 파트너십도 환영합니다.
+          </p>
+        </div>
+
         <div class="lp-container">
-          <h2 class="lp-h2">응급의료의 표준, 함께 만드시겠어요?</h2>
-          <p class="lp-lead">병원·공공기관·민간업체 파트너십을 기다립니다.</p>
-          <div class="lp-actions lp-mt-m">
-            <a href="#partner" class="lp-btn lp-btn--primary">도입 문의 ›</a>
-            <a href="#company" class="lp-btn lp-btn--ghost">회사 알아보기 ›</a>
+          <div class="contact-grid">
+            <div class="contact-card">
+              <div class="contact-ic">📞</div>
+              <div class="contact-t">전화 문의</div>
+              <a href="tel:062-236-1191" class="contact-v">062-236-1191</a>
+              <a href="mailto:contact@dallgoo.io" class="contact-sub">
+                contact@dallgoo.io
+              </a>
+            </div>
+
+            <div class="contact-card">
+              <div class="contact-ic">🔒</div>
+              <div class="contact-t">1:1 온라인 문의</div>
+              <p class="contact-desc">
+                게시판에 <b>비밀글</b>로 남기면 작성자와 관리자만 볼 수 있어요.
+              </p>
+              <RouterLink :to="{ name: 'post-create' }" class="lp-btn lp-btn--primary">
+                1:1 문의 남기기 ›
+              </RouterLink>
+            </div>
           </div>
         </div>
       </section>
@@ -1069,6 +1093,59 @@ const activeLoc = ref('hq')
 }
 @media (max-width: 620px) {
   .loc-ways {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== 문의 — 연락 카드 ===== */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.contact-card {
+  background: var(--card);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 30px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+.contact-ic {
+  font-size: 30px;
+}
+.contact-t {
+  font-size: 15px;
+  font-weight: 800;
+}
+.contact-v {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+}
+.contact-v:hover {
+  color: var(--primary);
+}
+.contact-sub {
+  font-size: 13.5px;
+  color: var(--muted);
+}
+.contact-sub:hover {
+  color: var(--primary);
+}
+.contact-desc {
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 0 0 8px;
+}
+@media (max-width: 620px) {
+  .contact-grid {
     grid-template-columns: 1fr;
   }
 }

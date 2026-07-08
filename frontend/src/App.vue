@@ -19,7 +19,11 @@ function handleForcedLogout() {
   auth.forceLogout()
   router.push({ name: 'login' })
 }
-onMounted(() => window.addEventListener('auth:logout', handleForcedLogout))
+onMounted(() => {
+  window.addEventListener('auth:logout', handleForcedLogout)
+  // 최초 로드 시 항상 최상단(해시/스크롤 복원 튐 방지 보강)
+  requestAnimationFrame(() => window.scrollTo(0, 0))
+})
 onUnmounted(() => window.removeEventListener('auth:logout', handleForcedLogout))
 </script>
 
