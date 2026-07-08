@@ -15,6 +15,7 @@ from app.api.routes import (
     files,
     notifications,
     posts,
+    transport,
     users,
 )
 from app.core.config import settings
@@ -169,6 +170,7 @@ app.include_router(comments.router, prefix=api_prefix)
 app.include_router(files.router, prefix=api_prefix)
 app.include_router(admin.router, prefix=api_prefix)
 app.include_router(notifications.router, prefix=api_prefix)
+app.include_router(transport.router, prefix=api_prefix)
 
 
 @app.get("/api/health", tags=["health"])

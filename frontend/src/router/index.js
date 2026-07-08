@@ -15,6 +15,23 @@ const routes = [
     component: () => import('@/views/PostListView.vue'),
   },
   {
+    path: '/transport',
+    name: 'transport',
+    component: () => import('@/views/TransportListView.vue'),
+  },
+  {
+    path: '/transport/new',
+    name: 'transport-create',
+    component: () => import('@/views/TransportCreateView.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: '/transport/:id',
+    name: 'transport-detail',
+    component: () => import('@/views/TransportDetailView.vue'),
+    props: true,
+  },
+  {
     path: '/login',
     name: 'login',
     component: () => import('@/views/LoginView.vue'),

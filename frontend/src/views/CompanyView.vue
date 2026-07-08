@@ -2,6 +2,7 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 
 import ImageSlot from '@/components/company/ImageSlot.vue'
+import WelcomePopup from '@/components/WelcomePopup.vue'
 
 // 상단 스크롤 진행률 표시줄(Scroll Progress Bar)
 const progress = ref(0)
@@ -99,6 +100,9 @@ const companyInfo = [
 
 <template>
   <div class="lp" ref="root">
+    <!-- 입장 팝업 (오늘 하루 보지 않기 / 닫기) -->
+    <WelcomePopup />
+
     <!-- 스크롤 진행률 표시줄 -->
     <div class="scroll-progress" :style="{ width: progress + '%' }" />
 
@@ -130,7 +134,7 @@ const companyInfo = [
       </section>
 
       <!-- ===== 비전 / 통계 (다크) ===== -->
-      <section class="lp-section lp-section--dark lp-center">
+      <section id="mission" class="lp-section lp-section--dark lp-center">
         <div class="lp-container">
           <span class="lp-badge">민간 최초 · AI 구급차 운영</span>
           <h2 class="lp-h2 lp-mt-m">차량이 아니라,<br />응급의료의 표준을 만듭니다</h2>
@@ -222,7 +226,7 @@ const companyInfo = [
       </section>
 
       <!-- ===== 2. 실시간 모니터링 (대시보드) ===== -->
-      <section class="lp-section lp-section--soft lp-center">
+      <section id="monitoring" class="lp-section lp-section--soft lp-center">
         <div class="lp-container lp-head">
           <h2 class="lp-h2">이송 중에도, 환자 곁을 지킵니다</h2>
           <p class="lp-lead">
@@ -283,7 +287,7 @@ const companyInfo = [
       </section>
 
       <!-- ===== Vision AI (다크) ===== -->
-      <section class="lp-section lp-section--dark lp-center">
+      <section id="ai-record" class="lp-section lp-section--dark lp-center">
         <div class="lp-container lp-head">
           <p class="lp-eyebrow">Vision AI</p>
           <h2 class="lp-h2">구급활동, AI가 기록합니다</h2>
@@ -341,7 +345,7 @@ const companyInfo = [
       </section>
 
       <!-- ===== 사회공헌 / 치료적 외출 (분할) ===== -->
-      <section class="lp-section lp-section--soft">
+      <section id="csr" class="lp-section lp-section--soft">
         <div class="lp-container lp-container--wide outing">
           <div class="outing-text">
             <p class="lp-eyebrow">사회공헌 · 치료적 외출</p>
@@ -379,7 +383,7 @@ const companyInfo = [
       </section>
 
       <!-- ===== 서비스 3축 상세 ===== -->
-      <section class="lp-section lp-section--soft">
+      <section id="pillars" class="lp-section lp-section--soft">
         <div class="lp-container lp-center lp-head">
           <p class="lp-eyebrow">서비스</p>
           <h2 class="lp-h2">하나의 플랫폼, 세 개의 축</h2>
@@ -449,6 +453,44 @@ const companyInfo = [
             <div class="lp-links-row lp-mt-m">
               <a href="#service" class="lp-link">서비스 살펴보기</a>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== 오시는 길 ===== -->
+      <section id="location" class="lp-section lp-section--soft lp-center">
+        <div class="lp-container lp-head">
+          <p class="lp-eyebrow">오시는 길</p>
+          <h2 class="lp-h2">달구를 만나러 오세요</h2>
+          <p class="lp-lead" style="margin: 0 auto">
+            광주광역시 동구 남문로 600 (소태동)
+          </p>
+        </div>
+
+        <div class="lp-container">
+          <div class="lp-card info">
+            <div class="info-row">
+              <div class="info-k">주소</div>
+              <div class="info-v">광주광역시 동구 남문로 600 (소태동)</div>
+            </div>
+            <div class="info-row">
+              <div class="info-k">대표전화</div>
+              <div class="info-v">062-236-1191</div>
+            </div>
+            <div class="info-row">
+              <div class="info-k">이메일</div>
+              <div class="info-v">contact@dallgoo.io</div>
+            </div>
+          </div>
+          <div class="lp-links-row lp-mt-m" style="justify-content: center">
+            <a
+              class="lp-link"
+              href="https://map.naver.com/p/search/광주광역시 동구 남문로 600"
+              target="_blank"
+              rel="noopener"
+            >
+              네이버 지도에서 보기 ›
+            </a>
           </div>
         </div>
       </section>

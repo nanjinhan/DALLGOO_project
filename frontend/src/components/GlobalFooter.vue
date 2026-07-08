@@ -9,32 +9,31 @@ const home = (hash) => ({ name: 'home', hash })
     <div class="gfoot-inner">
       <div class="gfoot-cols">
         <div class="gfoot-col">
+          <div class="gfoot-h">회사 소개</div>
+          <RouterLink :to="home('#company')">회사 개요</RouterLink>
+          <RouterLink :to="home('#mission')">미션 · 비전</RouterLink>
+          <RouterLink :to="home('#csr')">사회공헌</RouterLink>
+          <RouterLink :to="home('#location')">오시는 길</RouterLink>
+        </div>
+        <div class="gfoot-col">
           <div class="gfoot-h">서비스</div>
-          <RouterLink :to="home('#service')">구급차 호출</RouterLink>
-          <RouterLink :to="home('#service')">공정 배차</RouterLink>
-          <RouterLink :to="home('#service')">실시간 관제</RouterLink>
-          <RouterLink :to="home('#service')">AI 의료기록</RouterLink>
+          <RouterLink :to="home('#service')">구급차 호출 · 배차</RouterLink>
+          <RouterLink :to="home('#monitoring')">실시간 모니터링</RouterLink>
+          <RouterLink :to="home('#ai-record')">AI 의료기록</RouterLink>
+          <RouterLink :to="home('#pillars')">세 개의 축</RouterLink>
         </div>
         <div class="gfoot-col">
-          <div class="gfoot-h">연구·데이터</div>
-          <RouterLink :to="home('#data')">멀티모달 데이터</RouterLink>
+          <div class="gfoot-h">연구 · 데이터</div>
+          <RouterLink :to="home('#data')">데이터 플랫폼</RouterLink>
+          <RouterLink :to="home('#ai-record')">Vision AI</RouterLink>
           <RouterLink :to="home('#data')">R&D 협력</RouterLink>
-          <RouterLink :to="home('#data')">Vision AI</RouterLink>
-          <RouterLink :to="home('#data')">생체정보 관제</RouterLink>
-        </div>
-        <div class="gfoot-col">
-          <div class="gfoot-h">회사</div>
-          <RouterLink :to="home('#company')">회사소개</RouterLink>
-          <RouterLink :to="home('#partner')">치료적 외출</RouterLink>
-          <RouterLink :to="home('#partner')">파트너십</RouterLink>
-          <RouterLink :to="home('#partner')">채용</RouterLink>
         </div>
         <div class="gfoot-col">
           <div class="gfoot-h">고객지원</div>
           <RouterLink :to="{ name: 'posts' }">게시판</RouterLink>
           <RouterLink :to="home('#partner')">도입 문의</RouterLink>
-          <span>광주광역시 동구</span>
-          <span>남문로 600</span>
+          <a href="tel:062-236-1191">☎ 062-236-1191</a>
+          <span>광주광역시 동구 남문로 600</span>
         </div>
       </div>
       <div class="gfoot-legal">
