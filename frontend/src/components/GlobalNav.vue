@@ -58,6 +58,12 @@ function closeMenu() {
   closeTimer = setTimeout(() => (openIdx.value = -1), 120)
 }
 
+// 모바일 메뉴
+const mobileOpen = ref(false)
+function closeMobile() {
+  mobileOpen.value = false
+}
+
 const scrolled = ref(false)
 const onScroll = () => (scrolled.value = window.scrollY > 8)
 onMounted(() => {
@@ -148,8 +154,52 @@ async function onLogout() {
           <RouterLink :to="{ name: 'login' }" class="gn-link">로그인</RouterLink>
           <RouterLink :to="{ name: 'signup' }" class="gn-btn">회원가입</RouterLink>
         </template>
+
+        <!-- 모바일 햄버거 -->
+        <button
+          class="hamburger"
+          :aria-label="mobileOpen ? '메뉴 닫기' : '메뉴 열기'"
+          @click="mobileOpen = !mobileOpen"
+        >
+          {{ mobileOpen ? '✕' : '☰' }}
+        </button>
       </div>
     </div>
+
+    <!-- 모바일 메뉴 패널 -->
+    <Transition name="mm">
+      <nav v-if="mobileOpen" class="mobile-menu">
+        <template v-for="m in menu" :key="m.label">
+          <RouterLink
+            v-if="m.route"
+            :to="{ name: m.route }"
+            class="mm-top"
+            @click="closeMobile"
+          >
+            {{ m.label }}
+          </RouterLink>
+          <template v-else>
+            <RouterLink
+              :to="{ name: 'home', hash: m.hash }"
+              class="mm-top"
+              @click="closeMobile"
+            >
+              {{ m.label }}
+            </RouterLink>
+            <RouterLink
+              v-for="c in m.children"
+              :key="c.label"
+              :to="{ name: 'home', hash: c.hash }"
+              class="mm-sub"
+              @click="closeMobile"
+            >
+              {{ c.label }}
+            </RouterLink>
+          </template>
+        </template>
+        <a :href="`tel:${TEL}`" class="mm-tel">📞 {{ TEL }}</a>
+      </nav>
+    </Transition>
   </header>
 </template>
 
@@ -318,12 +368,77 @@ async function onLogout() {
   transform: translateY(-1px);
 }
 
-/* 좁은 화면: 메가 메뉴와 전화번호는 숨김(모바일 단순화) */
+/* 햄버거 버튼 — 데스크톱에선 숨김 */
+.hamburger {
+  display: none;
+  border: none;
+  background: none;
+  font-size: 22px;
+  line-height: 1;
+  padding: 4px 6px;
+  color: var(--text);
+}
+
+/* 모바일 메뉴 패널 */
+.mobile-menu {
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 22px 16px;
+  max-height: calc(100vh - 58px);
+  overflow-y: auto;
+}
+.mm-top {
+  padding: 12px 4px 6px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+.mm-sub {
+  padding: 8px 4px 8px 16px;
+  font-size: 14.5px;
+  color: var(--muted);
+}
+.mm-sub:hover,
+.mm-top:hover {
+  color: var(--primary);
+}
+.mm-tel {
+  margin-top: 12px;
+  padding: 12px;
+  text-align: center;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+}
+.mm-enter-active,
+.mm-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.mm-enter-from,
+.mm-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+/* 좁은 화면: 메가 메뉴·전화번호 숨기고 햄버거 노출 */
 @media (max-width: 1000px) {
   .gnav-menu {
     display: none;
   }
   .tel-btn {
+    display: none;
+  }
+  .hamburger {
+    display: block;
+  }
+}
+/* 넓은 화면에선 모바일 패널 항상 숨김(리사이즈 대비) */
+@media (min-width: 1001px) {
+  .mobile-menu {
     display: none;
   }
 }

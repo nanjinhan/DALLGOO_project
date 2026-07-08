@@ -96,8 +96,9 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
   scrollBehavior(to, from, savedPosition) {
-    // 해시(#service 등)로 이동 시 해당 섹션으로 부드럽게 스크롤
-    if (to.hash) {
+    // 사이트 안에서 메뉴 클릭 시에만 해시 섹션으로 스크롤.
+    // 새로고침·직접진입(from.name 없음)에서는 해시를 무시하고 최상단으로.
+    if (to.hash && from.name) {
       return { el: to.hash, behavior: 'smooth' }
     }
     if (savedPosition) return savedPosition

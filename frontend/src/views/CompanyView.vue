@@ -163,6 +163,108 @@ const companyInfo = [
         </div>
       </section>
 
+      <!-- ===== 회사소개 ===== -->
+      <section id="company" class="lp-section lp-center">
+        <div class="lp-container lp-head">
+          <p class="lp-eyebrow">회사소개</p>
+          <h2 class="lp-h2">주식회사 달구</h2>
+          <p class="lp-lead" style="margin: 0 auto">
+            광주 기반의 응급의료·구급차 플랫폼 기업. 응급이송 서비스를 디지털로
+            다시 설계합니다.
+          </p>
+        </div>
+
+        <div class="lp-container">
+          <div class="lp-card info">
+            <div v-for="row in companyInfo" :key="row[0]" class="info-row">
+              <div class="info-k">{{ row[0] }}</div>
+              <div class="info-v">{{ row[1] }}</div>
+            </div>
+          </div>
+
+          <div class="why">
+            <h3 class="lp-h3">왜 달구인가</h3>
+            <p>
+              응급의료는 지역 편차, 정보 비대칭, 기록의 단절, 배차의 비효율이
+              생기기 쉬운 영역입니다. 달구는 이를 앱과 데이터로 다시 설계합니다.
+              IT를 덧씌우는 수준이 아니라, 서비스 설계 자체를 새로 짭니다.
+            </p>
+            <p>
+              지금까지 얼마를 벌었는지보다, 응급의료 시장에서 어떤 표준을 만들 수
+              있는지가 더 중요한 회사입니다. 가능성과 과제가 동시에 큰, 응급의료
+              디지털 전환의 실험입니다.
+            </p>
+            <div class="lp-links-row lp-mt-m">
+              <a href="#service" class="lp-link">서비스 살펴보기</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== 사회공헌 / 치료적 외출 (분할) ===== -->
+      <section id="csr" class="lp-section lp-section--soft">
+        <div class="lp-container lp-container--wide outing">
+          <div class="outing-text">
+            <p class="lp-eyebrow">사회공헌 · 치료적 외출</p>
+            <h2 class="lp-h2">병상 밖에도,<br />일상이 있어야 합니다</h2>
+            <p class="lp-lead">
+              장기 입원 환자가 잠시 세상과 다시 만날 수 있도록. 달구는 이송
+              서비스를 사회적 가치와 잇습니다.
+            </p>
+            <div class="lp-links-row lp-mt-m">
+              <a href="#partner" class="lp-link">치료적 외출 이야기</a>
+            </div>
+          </div>
+          <div class="outing-img">
+            <ImageSlot
+              video="/images/outing.mp4"
+              src="/images/outing.jpg"
+              ratio="4 / 3"
+              label="치료적 외출 (영상 또는 사진)"
+              path="public/images/outing.mp4 또는 outing.jpg"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== 오시는 길 ===== -->
+      <section id="location" class="lp-section lp-center">
+        <div class="lp-container lp-head">
+          <p class="lp-eyebrow">오시는 길</p>
+          <h2 class="lp-h2">달구를 만나러 오세요</h2>
+          <p class="lp-lead" style="margin: 0 auto">
+            광주광역시 동구 남문로 600 (소태동)
+          </p>
+        </div>
+
+        <div class="lp-container">
+          <div class="lp-card info">
+            <div class="info-row">
+              <div class="info-k">주소</div>
+              <div class="info-v">광주광역시 동구 남문로 600 (소태동)</div>
+            </div>
+            <div class="info-row">
+              <div class="info-k">대표전화</div>
+              <div class="info-v">062-236-1191</div>
+            </div>
+            <div class="info-row">
+              <div class="info-k">이메일</div>
+              <div class="info-v">contact@dallgoo.io</div>
+            </div>
+          </div>
+          <div class="lp-links-row lp-mt-m" style="justify-content: center">
+            <a
+              class="lp-link"
+              href="https://map.naver.com/p/search/광주광역시 동구 남문로 600"
+              target="_blank"
+              rel="noopener"
+            >
+              네이버 지도에서 보기 ›
+            </a>
+          </div>
+        </div>
+      </section>
+
       <!-- ===== 1. 구급차 호출 (아이폰 목업) ===== -->
       <section id="service" class="lp-section lp-center">
         <div class="lp-container lp-head">
@@ -344,32 +446,6 @@ const companyInfo = [
         </div>
       </section>
 
-      <!-- ===== 사회공헌 / 치료적 외출 (분할) ===== -->
-      <section id="csr" class="lp-section lp-section--soft">
-        <div class="lp-container lp-container--wide outing">
-          <div class="outing-text">
-            <p class="lp-eyebrow">사회공헌 · 치료적 외출</p>
-            <h2 class="lp-h2">병상 밖에도,<br />일상이 있어야 합니다</h2>
-            <p class="lp-lead">
-              장기 입원 환자가 잠시 세상과 다시 만날 수 있도록. 달구는 이송
-              서비스를 사회적 가치와 잇습니다.
-            </p>
-            <div class="lp-links-row lp-mt-m">
-              <a href="#partner" class="lp-link">치료적 외출 이야기</a>
-            </div>
-          </div>
-          <div class="outing-img">
-            <ImageSlot
-              video="/images/outing.mp4"
-              src="/images/outing.jpg"
-              ratio="4 / 3"
-              label="치료적 외출 (영상 또는 사진)"
-              path="public/images/outing.mp4 또는 outing.jpg"
-            />
-          </div>
-        </div>
-      </section>
-
       <!-- ===== 파트너 CTA ===== -->
       <section id="partner" class="lp-section lp-center">
         <div class="lp-container">
@@ -415,82 +491,6 @@ const companyInfo = [
           </p>
           <div class="lp-actions lp-mt-m">
             <a href="#top" class="lp-btn lp-btn--primary">홈으로 ›</a>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===== 회사소개 ===== -->
-      <section id="company" class="lp-section lp-center">
-        <div class="lp-container lp-head">
-          <p class="lp-eyebrow">회사소개</p>
-          <h2 class="lp-h2">주식회사 달구</h2>
-          <p class="lp-lead" style="margin: 0 auto">
-            광주 기반의 응급의료·구급차 플랫폼 기업. 응급이송 서비스를 디지털로
-            다시 설계합니다.
-          </p>
-        </div>
-
-        <div class="lp-container">
-          <div class="lp-card info">
-            <div v-for="row in companyInfo" :key="row[0]" class="info-row">
-              <div class="info-k">{{ row[0] }}</div>
-              <div class="info-v">{{ row[1] }}</div>
-            </div>
-          </div>
-
-          <div class="why">
-            <h3 class="lp-h3">왜 달구인가</h3>
-            <p>
-              응급의료는 지역 편차, 정보 비대칭, 기록의 단절, 배차의 비효율이
-              생기기 쉬운 영역입니다. 달구는 이를 앱과 데이터로 다시 설계합니다.
-              IT를 덧씌우는 수준이 아니라, 서비스 설계 자체를 새로 짭니다.
-            </p>
-            <p>
-              지금까지 얼마를 벌었는지보다, 응급의료 시장에서 어떤 표준을 만들 수
-              있는지가 더 중요한 회사입니다. 가능성과 과제가 동시에 큰, 응급의료
-              디지털 전환의 실험입니다.
-            </p>
-            <div class="lp-links-row lp-mt-m">
-              <a href="#service" class="lp-link">서비스 살펴보기</a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===== 오시는 길 ===== -->
-      <section id="location" class="lp-section lp-section--soft lp-center">
-        <div class="lp-container lp-head">
-          <p class="lp-eyebrow">오시는 길</p>
-          <h2 class="lp-h2">달구를 만나러 오세요</h2>
-          <p class="lp-lead" style="margin: 0 auto">
-            광주광역시 동구 남문로 600 (소태동)
-          </p>
-        </div>
-
-        <div class="lp-container">
-          <div class="lp-card info">
-            <div class="info-row">
-              <div class="info-k">주소</div>
-              <div class="info-v">광주광역시 동구 남문로 600 (소태동)</div>
-            </div>
-            <div class="info-row">
-              <div class="info-k">대표전화</div>
-              <div class="info-v">062-236-1191</div>
-            </div>
-            <div class="info-row">
-              <div class="info-k">이메일</div>
-              <div class="info-v">contact@dallgoo.io</div>
-            </div>
-          </div>
-          <div class="lp-links-row lp-mt-m" style="justify-content: center">
-            <a
-              class="lp-link"
-              href="https://map.naver.com/p/search/광주광역시 동구 남문로 600"
-              target="_blank"
-              rel="noopener"
-            >
-              네이버 지도에서 보기 ›
-            </a>
           </div>
         </div>
       </section>
