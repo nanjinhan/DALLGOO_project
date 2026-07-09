@@ -194,9 +194,8 @@ const activeLoc = ref('hq')
         <div class="lp-container lp-head">
           <p class="lp-eyebrow">회사소개</p>
           <h2 class="lp-h2">주식회사 달구</h2>
-          <p class="lp-lead" style="margin: 0 auto">
-            광주 기반의 응급의료·구급차 플랫폼 기업. 응급이송 서비스를 디지털로
-            다시 설계합니다.
+          <p class="lp-lead" style="margin: 0 auto; max-width: none">
+            광주 기반의 응급의료·구급차 플랫폼 기업. 응급이송 서비스를 디지털로 다시 설계합니다.
           </p>
         </div>
 
