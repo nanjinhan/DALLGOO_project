@@ -16,16 +16,64 @@ jobs:
         uses: actions/checkout@v4
 
       - name: 빌드용 더미 .env 준비
-        # 실제 비밀값은 필요 없고, 빌드 단계에서 파일 존재만 있으면 됨
         run: cp .env.example .env
 
       - name: Docker 이미지 빌드(백엔드 + 프론트엔드)
         run: docker compose build
 
-  # ② CD — CI 통과 시 AWS 서버에 자동 배포
+  # ② CI — 백엔드 테스트(pytest). MySQL/Redis 서비스를 띄워 실제로 검증
+  test:
+    name: CI · 테스트
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpw
+          MYSQL_DATABASE: dallgoo_test
+          MYSQL_USER: dallgoo
+          MYSQL_PASSWORD: dallgoo_pw
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -prootpw"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=15
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      DATABASE_URL: mysql+pymysql://dallgoo:dallgoo_pw@127.0.0.1:3306/dallgoo_test
+      REDIS_URL: redis://127.0.0.1:6379/0
+      JWT_SECRET_KEY: test-secret-key-for-ci-only
+      # SMTP 미설정 → 이메일 인증 비활성(테스트에서 회원가입 바로 가능)
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: 파이썬 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 의존성 설치
+        run: pip install -r backend/requirements.txt -r backend/requirements-dev.txt
+
+      - name: pytest 실행
+        working-directory: backend
+        run: pytest
+
+  # ③ CD — 빌드·테스트 모두 통과 시에만 AWS 서버에 자동 배포
   deploy:
     name: CD · AWS 배포
-    needs: build          # build(CI)가 성공해야만 실행됨
+    needs: [build, test]        # 빌드 + 테스트가 모두 성공해야 배포
     runs-on: ubuntu-latest
     steps:
       - name: SSH 접속 후 배포
