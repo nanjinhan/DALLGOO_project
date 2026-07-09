@@ -1,0 +1,42 @@
+name: CI/CD
+
+# main 브랜치에 push될 때, 또는 GitHub 화면에서 수동 실행할 때 동작
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  # ① CI — 코드가 정상적으로 빌드되는지 검증
+  build:
+    name: CI · 빌드 검증
+    runs-on: ubuntu-latest
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: 빌드용 더미 .env 준비
+        # 실제 비밀값은 필요 없고, 빌드 단계에서 파일 존재만 있으면 됨
+        run: cp .env.example .env
+
+      - name: Docker 이미지 빌드(백엔드 + 프론트엔드)
+        run: docker compose build
+
+  # ② CD — CI 통과 시 AWS 서버에 자동 배포
+  deploy:
+    name: CD · AWS 배포
+    needs: build          # build(CI)가 성공해야만 실행됨
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH 접속 후 배포
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/DALLGOO_project
+            git pull origin main
+            docker compose up -d --build
+            docker compose exec -T backend alembic upgrade head
+            docker image prune -f
