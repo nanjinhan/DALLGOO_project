@@ -286,17 +286,6 @@ const activeLoc = ref('hq')
                   <div class="loc-way-v">{{ w.v }}</div>
                 </div>
               </div>
-
-              <div class="lp-links-row lp-mt-m" style="justify-content: center">
-                <a
-                  class="lp-link"
-                  :href="`https://map.kakao.com/link/search/${l.address}`"
-                  target="_blank"
-                  rel="noopener"
-                >
-                  카카오맵에서 크게 보기 ›
-                </a>
-              </div>
             </div>
           </template>
         </div>
@@ -1114,6 +1103,12 @@ const activeLoc = ref('hq')
   align-items: center;
   gap: 8px;
   text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.contact-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--primary);
+  box-shadow: 0 12px 30px -10px rgba(0, 113, 227, 0.28);
 }
 .contact-ic {
   font-size: 30px;
