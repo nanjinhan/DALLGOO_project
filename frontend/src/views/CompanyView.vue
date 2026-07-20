@@ -1,8 +1,10 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue'
 
+import { settingsApi } from '@/api/settings'
 import ImageSlot from '@/components/company/ImageSlot.vue'
 import MapEmbed from '@/components/company/MapEmbed.vue'
+import VideoSlot from '@/components/company/VideoSlot.vue'
 import WelcomePopup from '@/components/WelcomePopup.vue'
 
 // 상단 스크롤 진행률 표시줄(Scroll Progress Bar)
@@ -19,6 +21,7 @@ let io = null
 onMounted(() => {
   window.addEventListener('scroll', onScroll, { passive: true })
   onScroll()
+  loadSettings()
 
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   if (reduce || !root.value) return
@@ -26,7 +29,7 @@ onMounted(() => {
   const selector =
     '.lp-eyebrow, .lp-h1, .lp-h2, .lp-lead, .lp-badge, .lp-actions, ' +
     '.lp-links-row, .stats, .phone, .dash, .ai-card, .trio-card, ' +
-    '.outing-img, .svc, .info, .why'
+    '.outing-img, .svc, .info, .why, .video-slot'
   const els = root.value.querySelectorAll(selector)
   els.forEach((el) => el.classList.add('reveal'))
 
@@ -122,6 +125,19 @@ const locations = [
   },
 ]
 const activeLoc = ref('hq')
+
+// 회사 소개 영상 — 주소는 관리자 페이지에서 바꾼다(GET /api/settings).
+// 서버 응답 전/실패 시엔 빈 값이라 자리표시가 보인다.
+const introVideoUrl = ref('')
+
+async function loadSettings() {
+  try {
+    const { data } = await settingsApi.get()
+    introVideoUrl.value = data.intro_video_url || ''
+  } catch {
+    // 설정 조회 실패는 랜딩 전체를 막지 않는다 — 영상 자리만 비워둔다.
+  }
+}
 </script>
 
 <template>
@@ -223,6 +239,28 @@ const activeLoc = ref('hq')
               <a href="#service" class="lp-link">서비스 살펴보기</a>
             </div>
           </div>
+        </div>
+      </section>
+
+      <!-- ===== 회사 소개 영상 (다크) ===== -->
+      <section id="intro-video" class="lp-section lp-section--dark lp-center">
+        <div class="lp-container lp-head">
+          <p class="lp-eyebrow">소개 영상</p>
+          <h2 class="lp-h2">달구를 영상으로 만나보세요</h2>
+          <p class="lp-lead">
+            배차부터 AI 의료기록까지, 달구가 만드는 응급의료의 흐름을<br />
+            짧은 영상에 담았습니다.
+          </p>
+        </div>
+        <div class="lp-container lp-container--wide">
+          <VideoSlot
+            :youtube="introVideoUrl"
+            src="/images/intro.mp4"
+            ratio="16 / 9"
+            label="회사 소개 영상"
+            tone="dark"
+            path="유튜브 주소(CompanyView.vue의 introVideoUrl) 또는 public/images/intro.mp4"
+          />
         </div>
       </section>
 

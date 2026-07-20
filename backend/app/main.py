@@ -15,6 +15,7 @@ from app.api.routes import (
     files,
     notifications,
     posts,
+    settings as settings_routes,
     transport,
     users,
 )
@@ -171,6 +172,7 @@ app.include_router(files.router, prefix=api_prefix)
 app.include_router(admin.router, prefix=api_prefix)
 app.include_router(notifications.router, prefix=api_prefix)
 app.include_router(transport.router, prefix=api_prefix)
+app.include_router(settings_routes.router, prefix=api_prefix)
 
 
 @app.get("/api/health", tags=["health"])

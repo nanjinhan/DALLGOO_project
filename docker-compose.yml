@@ -16,7 +16,10 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
     ports:
-      - "3306:3306"
+      # 호스트 포트만 .env로 조정 가능(기본 3306). 컨테이너 내부는 항상 3306이고
+      # 백엔드는 도커 네트워크에서 db:3306으로 붙으므로 앱 동작과 무관하다.
+      # 로컬에서 다른 프로젝트와 포트가 겹칠 때만 .env에 DB_PORT를 지정한다.
+      - "${DB_PORT:-3306}:3306"
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
@@ -88,7 +91,9 @@ services:
       # Windows 바인드 마운트에서 네이티브 파일감시가 죽는 문제 방지(폴링 사용)
       WATCHFILES_FORCE_POLLING: "true"
     ports:
-      - "8000:8000"
+      # 호스트 포트만 .env로 조정 가능(기본 8000 — 운영 nginx가 바라보는 포트).
+      # 로컬에서 포트가 겹칠 때만 .env에 BACKEND_PORT를 지정한다.
+      - "${BACKEND_PORT:-8000}:8000"
     volumes:
       - ./backend:/app
       - uploads:/app/uploads

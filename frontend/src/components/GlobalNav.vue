@@ -21,6 +21,7 @@ const menu = [
     children: [
       { label: '회사 개요', hash: '#company' },
       { label: '미션 · 비전', hash: '#mission' },
+      { label: '소개 영상', hash: '#intro-video' },
       { label: '사회공헌', hash: '#csr' },
       { label: '오시는 길', hash: '#location' },
     ],

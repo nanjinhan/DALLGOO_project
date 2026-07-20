@@ -5,6 +5,7 @@ from app.models.file import File
 from app.models.like import CommentLike, PostLike
 from app.models.notification import Notification
 from app.models.post import Post
+from app.models.setting import SiteSetting
 from app.models.token import PasswordResetToken, RefreshToken
 from app.models.transport import TransportComment, TransportRecord
 from app.models.user import User
@@ -21,4 +22,5 @@ __all__ = [
     "Notification",
     "TransportRecord",
     "TransportComment",
+    "SiteSetting",
 ]

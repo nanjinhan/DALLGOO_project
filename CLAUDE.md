@@ -269,6 +269,18 @@ docker compose exec backend alembic upgrade head
 | expires_at | DATETIME | 발급 후 30분 |
 | used | BOOLEAN | default FALSE |
 
+### site_settings — 사이트 운영 설정 (key-value)
+| 컬럼 | 타입 | 제약 |
+|------|------|------|
+| key | VARCHAR(50) | PK — 설정 키 |
+| value | TEXT | NOT NULL — 설정 값 |
+| updated_at | DATETIME | on update now |
+
+> 관리자가 코드 수정 없이 바꾸는 값을 담는다. **설정이 늘어나도 마이그레이션 없이** 키만 추가하면 되도록 key-value 한 테이블로 둔다.
+> 허용 키와 기본값은 `crud/setting.py`의 `DEFAULTS`에서 관리하며, **DEFAULTS에 없는 키는 저장을 거부**한다(임의 키 주입 방지).
+> 레코드가 없으면 기본값을 쓰므로 초기 시딩이 필요 없다.
+> 현재 키: `intro_video_url` — 랜딩 회사 소개 영상(유튜브 주소).
+
 ---
 
 ## 7. API 명세
@@ -333,6 +345,18 @@ docker compose exec backend alembic upgrade head
 | DELETE | `/files/{id}` | 🔒 | 파일 개별 삭제 (글 작성자만) |
 
 > 파일 업로드는 글 작성/수정 API에서 multipart로 처리. 별도 업로드 엔드포인트는 선택사항.
+
+### 7.5 사이트 설정 — `/api/settings`
+
+| Method | Path | 인증 | 설명 |
+|--------|------|------|------|
+| GET | `/settings` | — | 공개 설정 조회 (랜딩페이지가 비로그인으로 호출) |
+| PATCH | `/settings` | 🔒 관리자 | 설정 변경 → 변경된 전체 설정 반환 |
+
+**`intro_video_url`** — 랜딩 회사 소개 영상.
+- `watch?v=` / `youtu.be` / `shorts` / `embed` / 11자리 ID 전부 입력 가능. 저장 시 `https://www.youtube.com/watch?v={ID}` **표준형으로 정규화**해 프론트가 형태를 신경 쓰지 않게 한다.
+- 유튜브 주소가 아니면 422(한국어 메시지). 빈 문자열은 허용 — 영상 섹션이 자리표시로 바뀐다.
+- 관리자 전용은 `PATCH`뿐. `GET`은 비로그인 공개다(랜딩이 써야 하므로).
 
 ---
 
