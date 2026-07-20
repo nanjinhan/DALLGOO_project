@@ -47,7 +47,12 @@ const ytEmbed = computed(
 const coverImage = computed(() =>
   ytId.value ? props.poster || ytThumb.value : props.poster,
 )
-const available = computed(() => (ytId.value || props.src) && !failed.value)
+// failed는 mp4 재생 실패만 뜻한다. 유튜브 주소가 설정보다 늦게 도착하는 경우
+// (초기엔 빈 값 → mp4 시도 → 404로 failed=true → 그 뒤 주소 도착) 유튜브까지
+// 막히지 않도록, ytId가 있으면 failed와 무관하게 재생 가능으로 본다.
+const available = computed(() =>
+  ytId.value ? true : Boolean(props.src) && !failed.value,
+)
 
 // 표지를 누른 순간부터 재생 — 히어로 배경영상과 달리 소리가 나오고 반복하지 않는다.
 function play() {

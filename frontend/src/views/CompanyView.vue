@@ -2,7 +2,9 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 
 import { settingsApi } from '@/api/settings'
+import CountUpNumber from '@/components/company/CountUpNumber.vue'
 import ImageSlot from '@/components/company/ImageSlot.vue'
+import SplitText from '@/components/company/SplitText.vue'
 import MapEmbed from '@/components/company/MapEmbed.vue'
 import VideoSlot from '@/components/company/VideoSlot.vue'
 import WelcomePopup from '@/components/WelcomePopup.vue'
@@ -27,7 +29,8 @@ onMounted(() => {
   if (reduce || !root.value) return
 
   const selector =
-    '.lp-eyebrow, .lp-h1, .lp-h2, .lp-lead, .lp-badge, .lp-actions, ' +
+    // .lp-h1(히어로 제목)은 SplitText가 직접 애니메이션하므로 제외 — 겹치면 두 번 재생된다.
+    '.lp-eyebrow, .lp-h2, .lp-lead, .lp-badge, .lp-actions, ' +
     '.lp-links-row, .stats, .phone, .dash, .ai-card, .trio-card, ' +
     '.outing-img, .svc, .info, .why, .video-slot'
   const els = root.value.querySelectorAll(selector)
@@ -92,6 +95,13 @@ const services = [
   },
 ]
 
+// 비전 섹션 통계 — 숫자로 시작하는 값은 CountUpNumber가 세어 올린다.
+const stats = [
+  { num: '2024', label: '설립 · 광주광역시 동구' },
+  { num: '3축', label: '배차 · 모니터링 · AI 기록' },
+  { num: '딥테크', label: '초기창업패키지 선정 · 벤처기업' },
+]
+
 const companyInfo = [
   ['대표자', '박시은'],
   ['설립일', '2024년 8월 20일'],
@@ -130,6 +140,15 @@ const activeLoc = ref('hq')
 // 서버 응답 전/실패 시엔 빈 값이라 자리표시가 보인다.
 const introVideoUrl = ref('')
 
+// 카드 위 커서를 따라가는 은은한 조명. JS는 좌표만 CSS 변수로 넘기고
+// 실제 그리기는 CSS가 맡는다(리렌더 없음).
+function onCardMove(e) {
+  const card = e.currentTarget
+  const r = card.getBoundingClientRect()
+  card.style.setProperty('--mx', `${e.clientX - r.left}px`)
+  card.style.setProperty('--my', `${e.clientY - r.top}px`)
+}
+
 async function loadSettings() {
   try {
     const { data } = await settingsApi.get()
@@ -153,7 +172,7 @@ async function loadSettings() {
       <section class="lp-section hero">
         <div class="lp-container lp-center">
           <p class="lp-eyebrow">달구</p>
-          <h1 class="lp-h1">응급의료의<br />미래를 잇다</h1>
+          <SplitText tag="h1" class="lp-h1" :text="'응급의료의\n미래를 잇다'" />
           <p class="lp-lead">
             공정 배차부터 AI 의료기록 자동화까지.<br />
             구급차를 데이터가 흐르는 응급의료 플랫폼으로 다시 설계합니다.
@@ -189,17 +208,11 @@ async function loadSettings() {
           </div>
 
           <div class="stats">
-            <div class="stat">
-              <div class="stat-num">2024</div>
-              <div class="stat-label">설립 · 광주광역시 동구</div>
-            </div>
-            <div class="stat">
-              <div class="stat-num">3축</div>
-              <div class="stat-label">배차 · 모니터링 · AI 기록</div>
-            </div>
-            <div class="stat">
-              <div class="stat-num">딥테크</div>
-              <div class="stat-label">초기창업패키지 선정 · 벤처기업</div>
+            <div v-for="s in stats" :key="s.label" class="stat">
+              <div class="stat-num">
+                <CountUpNumber :value="s.num" />
+              </div>
+              <div class="stat-label">{{ s.label }}</div>
             </div>
           </div>
         </div>
@@ -259,7 +272,7 @@ async function loadSettings() {
             ratio="16 / 9"
             label="회사 소개 영상"
             tone="dark"
-            path="유튜브 주소(CompanyView.vue의 introVideoUrl) 또는 public/images/intro.mp4"
+            path="관리자 페이지 → 회사 소개 영상에서 유튜브 주소 등록"
           />
         </div>
       </section>
@@ -501,7 +514,12 @@ async function loadSettings() {
 
         <div class="lp-container lp-container--wide">
           <div class="trio">
-            <div v-for="c in dataCards" :key="c.title" class="lp-card trio-card">
+            <div
+              v-for="c in dataCards"
+              :key="c.title"
+              class="lp-card trio-card spotlight"
+              @mousemove="onCardMove"
+            >
               <div class="trio-ic">{{ c.icon }}</div>
               <h3 class="lp-h3">{{ c.title }}</h3>
               <p class="trio-desc">{{ c.desc }}</p>
@@ -558,7 +576,12 @@ async function loadSettings() {
         </div>
 
         <div class="lp-container lp-container--wide svc-list">
-          <div v-for="s in services" :key="s.no" class="lp-card svc">
+          <div
+            v-for="s in services"
+            :key="s.no"
+            class="lp-card svc spotlight"
+            @mousemove="onCardMove"
+          >
             <div class="svc-ic">{{ s.icon }}</div>
             <div class="svc-body">
               <div class="svc-tag">{{ s.no }} · {{ s.tag }}</div>
@@ -1007,6 +1030,58 @@ async function loadSettings() {
 }
 
 /* ===== 스크롤 등장 애니메이션 ===== */
+/* ===== 카드 스포트라이트 (커서 추적 조명) ===== */
+.spotlight {
+  position: relative;
+  isolation: isolate; /* ::before가 카드 밖으로 새지 않도록 */
+  transition:
+    transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.spotlight::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  /* 밝은 배경 위라 흰 조명은 안 보인다 — 브랜드 블루를 옅게 깐다. */
+  background: radial-gradient(
+    340px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(0, 113, 227, 0.09),
+    transparent 68%
+  );
+  opacity: 0;
+  transition: opacity 0.32s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+.spotlight:hover::before {
+  opacity: 1;
+}
+.spotlight:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+}
+
+/* 터치 기기에선 hover가 고착되므로 끈다. */
+@media (hover: none) {
+  .spotlight::before {
+    display: none;
+  }
+  .spotlight:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spotlight,
+  .spotlight::before {
+    transition: none;
+  }
+  .spotlight:hover {
+    transform: none;
+  }
+}
+
 .reveal {
   opacity: 0;
   transform: translateY(26px);
